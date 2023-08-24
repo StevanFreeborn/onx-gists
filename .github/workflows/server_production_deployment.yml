@@ -18,12 +18,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.x'
-      - name: Build with dotnet
+      - name: Build solution
         run: dotnet build --configuration Release
         working-directory: ${{ env.WORKING_DIRECTORY }}
-      - name: dotnet publish
+      - name: Publish API
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Server.API
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}/Server.API
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
