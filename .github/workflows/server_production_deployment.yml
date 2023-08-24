@@ -1,0 +1,51 @@
+name: Server Production Deploy
+env:
+  WORKING_DIRECTORY: ./server
+on:
+  push:
+    paths:
+      - server/Server.API/**
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.x'
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Server.API
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: Server.API
+          path: ${{env.DOTNET_ROOT}}/Server.API
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: Server.API
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'onxgists'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A9EC1BCC704C41D1A370B09B33ABF95E }}
+          package: .
+          images:
