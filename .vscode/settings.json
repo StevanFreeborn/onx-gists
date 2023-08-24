@@ -1,0 +1,5 @@
+{
+  "dotnet.defaultSolution": "server/Server.sln",
+  "css.lint.unknownAtRules": "ignore",
+  "cSpell.words": ["tailwindcss"]
+}
