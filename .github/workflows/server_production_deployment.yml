@@ -2,12 +2,12 @@ name: Server Production Deploy
 env:
   WORKING_DIRECTORY: ./server
 on:
+  workflow_dispatch:
   push:
     paths:
       - server/Server.API/**
     branches:
       - main
-  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
