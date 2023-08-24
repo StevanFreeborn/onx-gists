@@ -1,28 +1,6 @@
-import NextAuth, { AuthOptions } from 'next-auth';
-import GithubProvider from 'next-auth/providers/github';
+import { nextAuthOptions } from '@/auth/nextAuthOptions';
+import NextAuth from 'next-auth';
 
-export const NextAuthOptions: AuthOptions = {
-  providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID ?? '',
-      clientSecret: process.env.GITHUB_SECRET ?? '',
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    jwt: async ({ token, user, account }) => {
-      if (account) {
-        token.access_token = account.access_token;
-      }
-
-      return token;
-    },
-  },
-};
-
-const handler = NextAuth(NextAuthOptions);
+const handler = NextAuth(nextAuthOptions);
 
 export { handler as GET, handler as POST };
