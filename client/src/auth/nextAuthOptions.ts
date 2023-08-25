@@ -30,7 +30,99 @@ declare module 'next-auth/jwt' {
   }
 }
 
-async function refreshAccessToken(token: JWT) {
+const prisma = new PrismaClient();
+
+export const nextAuthOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID ?? '',
+      clientSecret: process.env.GITHUB_SECRET ?? '',
+    }),
+    AzureADProvider({
+      clientId: process.env.AZURE_AD_CLIENT_ID ?? '',
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET ?? '',
+      tenantId: process.env.AZURE_AD_TENANT_ID,
+      authorization: {
+        params: {
+          scope: `openid profile email offline_access`,
+        },
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: 'jwt',
+  },
+  callbacks: {
+    jwt: async ({ token, account, user }) => {
+      if (account && user) {
+        token.provider = account.provider;
+        token.providerAccessToken = account.access_token;
+        token.providerAccessTokenExpiration = account.expires_at;
+        token.providerRefreshToken = account.refresh_token;
+
+        return token;
+      }
+
+      if (
+        token.providerAccessTokenExpiration &&
+        Date.now() < token.providerAccessTokenExpiration * 1000
+      ) {
+        return token;
+      }
+
+      return await refreshAccessToken(token);
+    },
+    session: async ({ session, token }) => {
+      if (session.apiJwt === undefined) {
+        session.apiJwt = createApiJwt({ userId: token.sub! });
+      } else {
+        const apiJwt = jwt.verify(
+          session.apiJwt,
+          process.env.NEXTAUTH_SECRET!
+        ) as JwtPayload;
+
+        const timeToRefresh = apiJwt.exp! - 120;
+        const nowInSecs = Date.now() / 1000;
+
+        if (nowInSecs > timeToRefresh) {
+          session.apiJwt = createApiJwt({ userId: token.sub! });
+        }
+      }
+
+      session.refreshErrored = token.refreshErrored;
+      return session;
+    },
+  },
+};
+
+export function createApiJwt({ userId }: { userId: string }) {
+  const apiJwt = {
+    iss: process.env.JWT_ISSUER,
+    aud: process.env.JWT_AUDIENCE,
+    sub: userId,
+    iat: Date.now() / 1000,
+    exp:
+      Date.now() / 1000 + 60 * parseInt(process.env.JWT_EXPIRATION_MINS ?? '0'),
+    jti: crypto.randomUUID(),
+  };
+
+  return jwt.sign(apiJwt, process.env.NEXTAUTH_SECRET!);
+}
+
+export async function refreshAccessToken(token: JWT) {
   try {
     const providers = {
       google: {
@@ -99,96 +191,3 @@ async function refreshAccessToken(token: JWT) {
     return token;
   }
 }
-
-const prisma = new PrismaClient();
-
-export const nextAuthOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID ?? '',
-      clientSecret: process.env.GITHUB_SECRET ?? '',
-    }),
-    AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID ?? '',
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET ?? '',
-      tenantId: process.env.AZURE_AD_TENANT_ID,
-      authorization: {
-        params: {
-          scope: `openid profile email offline_access`,
-        },
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-      authorization: {
-        params: {
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code',
-        },
-      },
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: 'jwt',
-  },
-  callbacks: {
-    jwt: async ({ token, account, user }) => {
-      if (account && user) {
-        token.provider = account.provider;
-        token.providerAccessToken = account.access_token;
-        token.providerAccessTokenExpiration = account.expires_at;
-        token.providerRefreshToken = account.refresh_token;
-
-        return token;
-      }
-
-      if (
-        token.providerAccessTokenExpiration &&
-        Date.now() < token.providerAccessTokenExpiration * 1000
-      ) {
-        return token;
-      }
-
-      return await refreshAccessToken(token);
-    },
-    session: async ({ session, token }) => {
-      function createApiJwt() {
-        const apiJwt = {
-          iss: process.env.JWT_ISSUER,
-          aud: process.env.JWT_AUDIENCE,
-          sub: token.sub,
-          iat: Date.now() / 1000,
-          exp:
-            Date.now() / 1000 +
-            60 * parseInt(process.env.JWT_EXPIRATION_MINS ?? '0'),
-          jti: crypto.randomUUID(),
-        };
-
-        return jwt.sign(apiJwt, process.env.NEXTAUTH_SECRET!);
-      }
-
-      if (session.apiJwt === undefined) {
-        session.apiJwt = createApiJwt();
-      } else {
-        const apiJwt = jwt.verify(
-          session.apiJwt,
-          process.env.NEXTAUTH_SECRET!
-        ) as JwtPayload;
-
-        const timeToRefresh = apiJwt.exp! - 120;
-        const nowInSecs = Date.now() / 1000;
-
-        if (nowInSecs > timeToRefresh) {
-          session.apiJwt = createApiJwt();
-        }
-      }
-
-      session.refreshErrored = token.refreshErrored;
-      return session;
-    },
-  },
-};
