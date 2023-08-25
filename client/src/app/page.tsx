@@ -7,7 +7,7 @@ export default function Home() {
   const session = useUserSession();
 
   async function callApi() {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL, {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL ?? '', {
       headers: {
         Authorization: `Bearer ${session.data?.apiJwt}`,
       },
