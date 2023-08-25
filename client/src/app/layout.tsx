@@ -1,5 +1,7 @@
+import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/providers/AuthProvider';
 import type { Metadata } from 'next';
+import { getServerSession } from 'next-auth';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -9,16 +11,20 @@ export const metadata: Metadata = {
   title: 'OnxGists',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
+    <AuthProvider session={session}>
+      <html lang="en">
+        <body className={inter.className}>
+          <Navbar />
+          {children}
+        </body>
+      </html>
+    </AuthProvider>
   );
 }
