@@ -7,7 +7,7 @@ export default function Home() {
   const session = useUserSession();
 
   async function callApi() {
-    const res = await fetch('http://localhost:3001', {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL, {
       headers: {
         Authorization: `Bearer ${session.data?.apiJwt}`,
       },
@@ -15,7 +15,7 @@ export default function Home() {
   }
 
   return (
-    <main className="">
+    <main className=''>
       <div>
         {session.status === 'authenticated' ? (
           <button onClick={() => signOut()}>Sign Out</button>
