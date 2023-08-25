@@ -7,5 +7,16 @@ type Props = {
 };
 
 export const AuthProvider = ({ children }: Props) => {
-  return <SessionProvider>{children}</SessionProvider>;
+  const refetchInterval =
+    60 * parseInt(process.env.NEXT_PUBLIC_SESSION_REFETCH_MINS ?? '1');
+
+  return (
+    <SessionProvider
+      refetchInterval={refetchInterval}
+      refetchOnWindowFocus={true}
+      refetchWhenOffline={false}
+    >
+      {children}
+    </SessionProvider>
+  );
 };

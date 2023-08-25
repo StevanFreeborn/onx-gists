@@ -1,6 +1,6 @@
 'use client';
 
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 
 export function useUserSession() {
@@ -8,6 +8,7 @@ export function useUserSession() {
 
   useEffect(() => {
     if (session.data?.refreshErrored) {
+      signOut();
       signIn();
     }
   }, [session]);
