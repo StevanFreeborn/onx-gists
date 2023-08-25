@@ -1,5 +1,6 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AuthOptions, DefaultSession, DefaultUser } from 'next-auth';
 import { DefaultJWT, JWT } from 'next-auth/jwt';
 import AzureADProvider from 'next-auth/providers/azure-ad';
@@ -8,6 +9,7 @@ import GoogleProvider from 'next-auth/providers/google';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
+    apiJwt?: string;
     refreshErrored: boolean;
   }
 
@@ -23,27 +25,47 @@ declare module 'next-auth/jwt' {
     providerRefreshToken?: string;
     provider: string;
     refreshErrored: boolean;
+    iss?: string;
+    aud?: string;
   }
 }
 
 async function refreshAccessToken(token: JWT) {
   try {
-    const urls = {
-      google: 'https://oauth2.googleapis.com/token',
-      'azure ad': 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-      github: 'https://github.com/login/oauth/access_token',
-    } as { [key: string]: string };
+    const providers = {
+      google: {
+        url: 'https://oauth2.googleapis.com/token',
+        id: process.env.GOOGLE_CLIENT_ID ?? '',
+        secret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      },
+      'azure-ad': {
+        url: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        id: process.env.AZURE_AD_CLIENT_ID ?? '',
+        secret: process.env.AZURE_AD_CLIENT_SECRET ?? '',
+      },
+      github: {
+        url: 'https://github.com/login/oauth/access_token',
+        id: process.env.GITHUB_ID ?? '',
+        secret: process.env.GITHUB_SECRET ?? '',
+      },
+    } as {
+      [key: string]: {
+        url: string;
+        id: string;
+        secret: string;
+      };
+    };
 
-    const url = urls[token.provider];
+    const provider = providers[token.provider];
 
-    const response = await fetch(url, {
+    const response = await fetch(provider.url, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       method: 'POST',
       body: new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID ?? '',
-        client_secret: process.env.GITHUB_SECRET ?? '',
+        client_id: provider.id,
+        client_secret: provider.secret,
         grant_type: 'refresh_token',
         refresh_token: token.providerRefreshToken ?? '',
       }),
@@ -71,7 +93,8 @@ async function refreshAccessToken(token: JWT) {
 
     return token;
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     token.refreshErrored = true;
     return token;
   }
@@ -133,6 +156,37 @@ export const nextAuthOptions: AuthOptions = {
       return await refreshAccessToken(token);
     },
     session: async ({ session, token }) => {
+      function createApiJwt() {
+        const apiJwt = {
+          iss: process.env.JWT_ISSUER,
+          aud: process.env.JWT_AUDIENCE,
+          sub: token.sub,
+          iat: Date.now() / 1000,
+          exp:
+            Date.now() / 1000 +
+            60 * parseInt(process.env.JWT_EXPIRATION_MINS ?? '0'),
+          jti: crypto.randomUUID(),
+        };
+
+        return jwt.sign(apiJwt, process.env.NEXTAUTH_SECRET!);
+      }
+
+      if (session.apiJwt === undefined) {
+        session.apiJwt = createApiJwt();
+      } else {
+        const apiJwt = jwt.verify(
+          session.apiJwt,
+          process.env.NEXTAUTH_SECRET!
+        ) as JwtPayload;
+
+        const timeToRefresh = apiJwt.exp! - 120;
+        const nowInSecs = Date.now() / 1000;
+
+        if (nowInSecs > timeToRefresh) {
+          session.apiJwt = createApiJwt();
+        }
+      }
+
       session.refreshErrored = token.refreshErrored;
       return session;
     },
