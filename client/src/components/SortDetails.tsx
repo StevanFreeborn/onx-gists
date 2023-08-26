@@ -42,7 +42,7 @@ export default function SortDetails({
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-  });
+  }, [detailsRef]);
 
   return (
     <details ref={detailsRef} className="relative text-xs">
