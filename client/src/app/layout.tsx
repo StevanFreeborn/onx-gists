@@ -21,7 +21,7 @@ export default async function RootLayout({
   return (
     <AuthProvider session={session}>
       <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className}`}>
           <NextTopLoader showSpinner={false} />
           <Navbar />
           {children}
