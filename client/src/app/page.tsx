@@ -1,7 +1,12 @@
 'use client';
 
 import { useUserSession } from '@/auth/useUserSession';
+import SortDetails from '@/components/SortDetails';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { AiFillCaretDown } from 'react-icons/ai';
 import { BsCode } from 'react-icons/bs';
+import { GiCheckMark } from 'react-icons/gi';
 
 export default function Home() {
   const session = useUserSession();
@@ -14,6 +19,8 @@ export default function Home() {
     });
   }
 
+  const params = useSearchParams();
+
   return (
     <main className="flex flex-col flex-1 py-4 text-primary-white">
       <div className="flex w-full justify-between gap-2 items-center px-4 pb-4 border-b border-gray-600">
@@ -22,10 +29,17 @@ export default function Home() {
           <h1 className="text-lg font-bold">Discover gists</h1>
         </div>
         <div>
+          <SortDetails
+            sortBy={params.get('sort')}
+            direction={params.get('direction')}
+          />
+        </div>
+      </div>
+      <div>
+        <div>
           <button onClick={() => callApi()}>Call Api</button>
         </div>
       </div>
-      <div></div>
     </main>
   );
 }

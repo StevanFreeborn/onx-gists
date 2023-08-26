@@ -31,7 +31,7 @@ function SignOutButton() {
 
 function UserModal({ user }: { user: Session | null }) {
   return (
-    <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm">
+    <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm z-50">
       <div className="p-3 border-b border-gray-600">
         <div>Sign in as</div>
         <div className="font-semibold">{user?.user?.name}</div>
@@ -213,8 +213,7 @@ export default function Navbar() {
                       alt="Current User Image"
                       width={25}
                       height={25}
-                      objectFit="cover"
-                      className="rounded-full"
+                      className="rounded-full object-cover"
                     />
                     {session?.user?.name}
                   </Link>
@@ -241,8 +240,7 @@ export default function Navbar() {
                       alt="Current User Image"
                       width={20}
                       height={20}
-                      objectFit="cover"
-                      className="rounded-full"
+                      className="rounded-full object-cover"
                     />
                     <AiFillCaretDown
                       style={{ width: '10px', height: '10px' }}
