@@ -1,20 +1,95 @@
 'use client';
 
 import { useUserSession } from '@/auth/useUserSession';
+import { useRouter } from '@/hooks/useRouter';
+import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import NProgress from 'nprogress';
+import { useEffect, useRef, useState } from 'react';
+import { AiFillCaretDown, AiOutlinePlus } from 'react-icons/ai';
+
+function SignOutButton() {
+  const router = useRouter();
+  return (
+    <button
+      onClick={async () => {
+        const data = await signOut({
+          callbackUrl: '/',
+          redirect: false,
+        });
+        router.push(data.url);
+      }}
+      className="block w-full py-2 pl-3 pr-4 text-left text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+    >
+      Sign out
+    </button>
+  );
+}
+
+function UserModal({ user }: { user: Session | null }) {
+  return (
+    <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-white dark:bg-gray-900 border border-slate-500 rounded-md text-sm">
+      <div className="p-3 border-b border-slate-500">
+        <div>Sign in as</div>
+        <div className="font-semibold">{user?.user?.name}</div>
+      </div>
+      <ul className="flex flex-col gap-2 p-3 border-b border-slate-500">
+        <li>
+          <Link
+            href="#"
+            className="block text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+          >
+            Your gists
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="#"
+            className="block text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+          >
+            Starred gists
+          </Link>
+        </li>
+      </ul>
+      <div className="p-3">
+        <SignOutButton />
+      </div>
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [isNavbarOpen, setIsNavBarOpen] = useState(false);
-  const { status } = useUserSession();
-  const router = useRouter();
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const userModalRef = useRef<HTMLDivElement>(null);
+  const { status, data: session } = useUserSession();
+  const userImageSrc = session?.user?.image ?? 'https://placehold.co/400';
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        isUserModalOpen &&
+        userModalRef.current &&
+        userModalRef.current.contains(e.target as Node) === false
+      ) {
+        setIsUserModalOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    NProgress.done();
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [pathname, searchParams, status, userModalRef, isUserModalOpen]);
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900">
+    <nav className="bg-white border-b border-slate-500 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-between mx-auto p-4 md:flex-row">
-        <div className="flex flex-1 justify-between gap-5 md:justify-start">
+        <div className="flex flex-1 w-full justify-between gap-5 md:justify-start">
           <Link href="/" className="flex items-center">
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
               Onx
@@ -48,26 +123,12 @@ export default function Navbar() {
             />
           </div>
           <div className="flex md:order-1">
-            <button
-              onClick={() => setIsNavBarOpen(!isNavbarOpen)}
-              type="button"
-              className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 mr-1"
+            <Link
+              href="#"
+              className="flex w-full h-full items-center justify-center md:hidden py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
             >
-              <svg
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </button>
+              <AiOutlinePlus />
+            </Link>
             <button
               onClick={() => setIsNavBarOpen(!isNavbarOpen)}
               type="button"
@@ -129,48 +190,70 @@ export default function Navbar() {
                   href="#"
                   className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Sign in
+                  Sign up/in
                 </Link>
               </li>
             ) : (
               <>
-                <li>
+                <li className="md:hidden text-sm">
                   <Link
                     href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="flex w-full h-full items-center justify-start py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
-                    All gists
+                    All Gists
                   </Link>
                 </li>
-                <li>
+                <li className="md:hidden text-sm">
                   <Link
                     href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="flex gap-2 w-full h-full items-center justify-start py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
-                    Your gists
+                    <Image
+                      src={userImageSrc}
+                      alt="Current User Image"
+                      width={25}
+                      height={25}
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                    {session?.user?.name}
                   </Link>
                 </li>
-                <li>
+                <li className="md:hidden text-sm">
+                  <SignOutButton />
+                </li>
+                <li className="hidden md:block">
                   <Link
                     href="#"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="flex w-full h-full items-center justify-center py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
-                    Starred gists
+                    <AiOutlinePlus />
                   </Link>
                 </li>
-                <li>
+                <li className="relative hidden md:block">
                   <button
-                    onClick={async () => {
-                      const data = await signOut({
-                        callbackUrl: '/',
-                        redirect: false,
-                      });
-                      router.push(data.url);
-                    }}
-                    className="block w-full py-2 pl-3 pr-4 text-left text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    type="button"
+                    onClick={() => setIsUserModalOpen(!isUserModalOpen)}
+                    className="flex items-center justify-center gap-2 w-full py-2 pl-3 pr-4 text-left text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
-                    Sign out
+                    <Image
+                      src={userImageSrc}
+                      alt="Current User Image"
+                      width={20}
+                      height={20}
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                    <AiFillCaretDown
+                      style={{ width: '10px', height: '10px' }}
+                    />
                   </button>
+                  <div
+                    ref={userModalRef}
+                    className={isUserModalOpen ? '' : 'hidden'}
+                  >
+                    <UserModal user={session} />
+                  </div>
                 </li>
               </>
             )}
