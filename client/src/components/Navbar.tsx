@@ -22,7 +22,7 @@ function SignOutButton() {
         });
         router.push(data.url);
       }}
-      className="block w-full py-2 pl-3 pr-4 text-left rounded md:p-0 md:hover:text-blue-500 hover:bg-primary-gray md:hover:bg-transparent border-gray-700"
+      className="block w-full py-2 pl-3 pr-4 text-left text-primary-white rounded md:p-0 md:hover:text-blue-500 hover:bg-primary-gray md:hover:bg-transparent border-gray-700"
     >
       Sign out
     </button>

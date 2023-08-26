@@ -12,6 +12,29 @@ enum SortOrders {
   updatedAscending = 'updated-asc',
 }
 
+function SortLink({
+  currentLinkKey,
+  linkKey,
+  link,
+  linkClickHandler,
+}: {
+  currentLinkKey: string;
+  linkKey: string;
+  link: { linkText: string; href: string };
+  linkClickHandler: () => void;
+}) {
+  return (
+    <Link
+      onClick={linkClickHandler}
+      href={link.href}
+      className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
+    >
+      <GiCheckMark className={currentLinkKey == linkKey ? '' : 'invisible'} />
+      <span>{link.linkText}</span>
+    </Link>
+  );
+}
+
 export default function SortDetails({
   sortBy,
   direction,
@@ -19,7 +42,7 @@ export default function SortDetails({
   sortBy?: string | null;
   direction?: string | null;
 }) {
-  const current =
+  const currentLinkKey =
     sortBy === undefined ||
     sortBy === null ||
     direction === undefined ||
@@ -28,6 +51,33 @@ export default function SortDetails({
       : `${sortBy}-${direction}`;
 
   const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  const links = {
+    [SortOrders.createdDescending]: {
+      linkText: 'Recently Created',
+      href: '?direction=desc&sort=created',
+    },
+    [SortOrders.createdAscending]: {
+      linkText: 'Least Recently Created',
+      href: '?direction=asc&sort=created',
+    },
+    [SortOrders.updatedDescending]: {
+      linkText: 'Recently Updated',
+      href: '?direction=desc&sort=updated',
+    },
+    [SortOrders.updatedAscending]: {
+      linkText: 'Least Updated Created',
+      href: '?direction=asc&sort=updated',
+    },
+  } as { [key: string]: { linkText: string; href: string } };
+
+  const currentLink = links[currentLinkKey];
+
+  function handleLinkClick() {
+    if (detailsRef.current && detailsRef.current.open) {
+      detailsRef.current.open = false;
+    }
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -48,7 +98,7 @@ export default function SortDetails({
     <details ref={detailsRef} className="relative text-xs">
       <summary className="flex gap-1 items-center justify-center py-1 px-2 list-none bg-secondary-gray border border-gray-600 rounded cursor-pointer">
         <span>Sort:</span>
-        <span className="font-semibold">Recently Created</span>
+        <span className="font-semibold">{currentLink.linkText}</span>
         <AiFillCaretDown style={{ width: '10px', height: '10px' }} />
       </summary>
       <div className="absolute mt-2 left-auto right-0 w-[300px] bg-secondary-gray rounded-md border border-gray-600 z-50">
@@ -56,47 +106,15 @@ export default function SortDetails({
           <span>Sort Options</span>
         </div>
         <div className="flex flex-col">
-          <Link
-            href="#"
-            className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
-          >
-            <GiCheckMark
-              className={
-                current == SortOrders.createdDescending ? '' : 'invisible'
-              }
+          {Object.keys(links).map(link => (
+            <SortLink
+              key={link}
+              currentLinkKey={currentLinkKey}
+              linkKey={link}
+              link={links[link]}
+              linkClickHandler={handleLinkClick}
             />
-            <span>Recently Created</span>
-          </Link>
-          <Link
-            href="#"
-            className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
-          >
-            <GiCheckMark
-              className={
-                current == SortOrders.createdAscending ? '' : 'invisible'
-              }
-            />
-            <span>Least Recently Created</span>
-          </Link>
-          <Link
-            href="#"
-            className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
-          >
-            <GiCheckMark
-              className={
-                current == SortOrders.updatedDescending ? '' : 'invisible'
-              }
-            />
-            <span>Recently Updated</span>
-          </Link>
-          <Link href="#" className="flex gap-2 items-center p-2 pl-7">
-            <GiCheckMark
-              className={
-                current == SortOrders.updatedAscending ? '' : 'invisible'
-              }
-            />
-            <span>Least Recently Created</span>
-          </Link>
+          ))}
         </div>
       </div>
     </details>
