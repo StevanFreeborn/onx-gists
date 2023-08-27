@@ -30,7 +30,7 @@ function SortLink({
       className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
     >
       <GiCheckMark className={currentLinkKey == linkKey ? '' : 'invisible'} />
-      <span>{link.linkText}</span>
+      <span className="hover:text-primary-orange">{link.linkText}</span>
     </Link>
   );
 }
@@ -96,7 +96,7 @@ export default function SortDetails({
 
   return (
     <details ref={detailsRef} className="relative text-xs">
-      <summary className="flex gap-1 items-center justify-center py-1 px-2 list-none bg-secondary-gray border border-gray-600 rounded cursor-pointer">
+      <summary className="flex gap-1 items-center justify-center py-1 px-2 list-none bg-secondary-gray border border-gray-600 rounded cursor-pointer hover:bg-gray-600">
         <span>Sort:</span>
         <span className="font-semibold">{currentLink.linkText}</span>
         <AiFillCaretDown style={{ width: '10px', height: '10px' }} />

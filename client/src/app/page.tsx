@@ -199,9 +199,19 @@ export default async function Home({
                   </div>
                   <div className="flex flex-col gap-1 text-sm">
                     <div className="flex gap-1">
-                      <Link href="#">{gist.username}</Link>
+                      <Link
+                        href="#"
+                        className="text-primary-orange hover:underline"
+                      >
+                        {gist.username}
+                      </Link>
                       <span>/</span>
-                      <Link href="#">{gist.name}</Link>
+                      <Link
+                        href="#"
+                        className="text-primary-orange font-semibold hover:underline"
+                      >
+                        {gist.name}
+                      </Link>
                     </div>
                     <div>
                       <div className="text-xs text-gray-500">

@@ -22,7 +22,7 @@ function SignOutButton() {
         });
         router.push(data.url);
       }}
-      className="block w-full py-2 pl-3 pr-4 text-left text-primary-white rounded md:p-0 md:hover:text-blue-500 hover:bg-primary-gray md:hover:bg-transparent border-gray-700"
+      className="block w-full py-2 pl-3 pr-4 text-left text-primary-white rounded md:p-0 md:hover:text-primary-orange hover:bg-primary-gray md:hover:bg-transparent"
     >
       Sign out
     </button>
@@ -40,7 +40,7 @@ function UserModal({ user }: { user: Session | null }) {
         <li>
           <Link
             href="#"
-            className="block rounded md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+            className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Your gists
           </Link>
@@ -48,7 +48,7 @@ function UserModal({ user }: { user: Session | null }) {
         <li>
           <Link
             href="#"
-            className="block rounded md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+            className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Starred gists
           </Link>
@@ -118,21 +118,23 @@ export default function Navbar() {
             <input
               type="text"
               id="search-navbar"
-              className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white"
               placeholder="Search..."
             />
           </div>
           <div className="flex md:order-1">
-            <Link
-              href="#"
-              className="flex w-full h-full items-center justify-center md:hidden py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-            >
-              <AiOutlinePlus />
-            </Link>
+            {status === 'authenticated' ? (
+              <Link
+                href="#"
+                className="flex w-full h-full items-center justify-center md:hidden py-2 pl-3 pr-4 text-primary-white hover:text-primary-orange"
+              >
+                <AiOutlinePlus />
+              </Link>
+            ) : null}
             <button
               onClick={() => setIsNavBarOpen(!isNavbarOpen)}
               type="button"
-              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-primary-white rounded-lg md:hidden hover:text-primary-orange"
             >
               <svg
                 className="w-5 h-5"
@@ -176,7 +178,7 @@ export default function Navbar() {
             <input
               type="text"
               id="search-navbar"
-              className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white"
               placeholder="Search..."
             />
           </div>
@@ -188,7 +190,7 @@ export default function Navbar() {
                 <Link
                   onClick={() => signIn()}
                   href="#"
-                  className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 pl-3 pr-4 text-primary-white rounded md:hover:bg-transparent md:hover:text-primary-orange md:p-0 hover:bg-primary-gray"
                 >
                   Sign up/in
                 </Link>
@@ -224,7 +226,7 @@ export default function Navbar() {
                 <li className="hidden md:block">
                   <Link
                     href="#"
-                    className="flex w-full h-full items-center justify-center py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="flex w-full h-full items-center justify-center p-0 text-primary-white hover:text-primary-orange"
                   >
                     <AiOutlinePlus />
                   </Link>
@@ -233,13 +235,13 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setIsUserModalOpen(!isUserModalOpen)}
-                    className="flex items-center justify-center gap-2 w-full py-2 pl-3 pr-4 text-left rounded md:p-0 md:hover:text-blue-500 hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
+                    className="flex items-center justify-center gap-2 w-full p-0 text-left text-primary-white hover:text-primary-orange"
                   >
                     <Image
                       src={userImageSrc}
                       alt="Current User Image"
-                      width={20}
-                      height={20}
+                      width={25}
+                      height={25}
                       className="rounded-full object-cover"
                     />
                     <AiFillCaretDown
