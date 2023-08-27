@@ -66,7 +66,7 @@ export default function SortDetails({
       href: '?direction=desc&sort=updated',
     },
     [SortOrders.updatedAscending]: {
-      linkText: 'Least Updated Created',
+      linkText: 'Least Recently Updated',
       href: '?direction=asc&sort=updated',
     },
   } as { [key: string]: { linkText: string; href: string } };
