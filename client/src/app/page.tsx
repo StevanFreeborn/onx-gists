@@ -1,4 +1,5 @@
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
+import Editor from '@/components/Editor';
 import SortDetails from '@/components/SortDetails';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
@@ -55,7 +56,7 @@ export default async function Home({
   // TODO: Actually get gists from gist service
   const gists = [
     {
-      id: '',
+      id: '12345678',
       userId: 'user123',
       username: 'john_doe',
       name: 'Sample Object 1',
@@ -65,7 +66,7 @@ export default async function Home({
       created: '2023-08-25',
     },
     {
-      id: '',
+      id: '123456',
       userId: 'user456',
       username: 'jane_smith',
       name: 'Sample Object 2',
@@ -75,12 +76,12 @@ export default async function Home({
       created: '2022-08-25',
     },
     {
-      id: '',
+      id: '1234567',
       userId: 'user789',
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) { return Math.sin(x); }',
+      formula: 'function(x) {\n  return Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -111,10 +112,10 @@ export default async function Home({
           <SortDetails sortBy={sortParam} direction={directionParam} />
         </div>
       </div>
-      <div className="flex flex-col gap-4 py-4 px-4">
+      <div className="flex flex-col gap-8 py-4 px-4">
         {gists.map(gist => {
           return (
-            <div key={gist.id}>
+            <div key={gist.id} className="flex flex-col gap-4">
               <div>
                 <div className="flex gap-3 items-start">
                   <div>
@@ -143,15 +144,16 @@ export default async function Home({
                   </div>
                 </div>
               </div>
-              <div className="border border-gray-600 rounded-md">
-                <textarea
-                  name={gist.id + gist.name}
-                  id={gist.id}
-                  className="flex w-full h-auto resize-none focus:outline-none focus:border-none rounded-md"
-                  readOnly={true}
-                  defaultValue={gist.formula}
-                />
-              </div>
+              <Link href="#" className="relative">
+                <div className="border border-gray-600 rounded-md p-1 hover:border-primary-orange">
+                  <Editor docState={gist.formula} readonly={true} />
+                </div>
+                <div className="absolute w-full h-full text-right rounded-md opacity-0 right-0 top-0 hover:border hover:border-primary-orange hover:opacity-100">
+                  <span className="py-[7px] px-2 rounded-tr-md text-xs m--1 bg-primary-orange text-primary-white">
+                    {gist.name}
+                  </span>
+                </div>
+              </Link>
             </div>
           );
         })}

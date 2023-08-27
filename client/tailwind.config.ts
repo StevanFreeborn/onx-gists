@@ -11,6 +11,7 @@ const config: Config = {
         'primary-gray': '#24272d',
         'secondary-gray': '#2f333a',
         'primary-white': '#d0d9e4',
+        'primary-orange': '#d5782f',
       },
     },
   },
