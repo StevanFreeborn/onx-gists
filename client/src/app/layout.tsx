@@ -1,3 +1,4 @@
+import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/providers/AuthProvider';
 import type { Metadata } from 'next';
@@ -20,11 +21,12 @@ export default async function RootLayout({
   const session = await getServerSession();
   return (
     <AuthProvider session={session}>
-      <html lang="en">
-        <body className={`${inter.className}`}>
-          <NextTopLoader showSpinner={false} />
+      <html lang="en" className="w-full h-full">
+        <body className={`flex flex-col w-full h-full ${inter.className}`}>
+          <NextTopLoader color="#d5782f" showSpinner={false} />
           <Navbar />
-          {children}
+          <div className="flex-1">{children}</div>
+          <Footer />
         </body>
       </html>
     </AuthProvider>

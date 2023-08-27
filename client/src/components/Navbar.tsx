@@ -90,8 +90,8 @@ export default function Navbar() {
     <nav className="bg-secondary-gray text-primary-white shadow-[rgba(0,_0,_0,_0.05)_0px_2px_5px_0px]">
       <div className="flex flex-col items-center justify-between mx-auto p-4 md:flex-row">
         <div className="flex flex-1 w-full justify-between gap-5 md:justify-start">
-          <Link href="/" className="flex items-center">
-            <span className="self-center text-2xl font-semibold whitespace-nowrap">
+          <Link href="/" className="flex items-center group/brand">
+            <span className="self-center text-2xl font-semibold whitespace-nowrap group-hover/brand:text-primary-orange">
               Onx
             </span>
             <span className="self-center text-2xl whitespace-nowrap">
