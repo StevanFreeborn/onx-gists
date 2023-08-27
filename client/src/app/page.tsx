@@ -182,10 +182,10 @@ export default async function Home({
           <SortDetails sortBy={sortParam} direction={directionParam} />
         </div>
       </div>
-      <div className="flex flex-col gap-8 py-4 px-4">
+      <div className="flex flex-col w-full justify-center gap-8 py-6 px-4">
         {gists.map(gist => {
           return (
-            <div key={gist.id} className="flex flex-col gap-4">
+            <div key={gist.id} className="flex flex-col w-full gap-4 max-w-4xl">
               <div>
                 <div className="flex gap-3 items-start">
                   <div>
