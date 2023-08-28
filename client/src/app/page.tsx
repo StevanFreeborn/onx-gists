@@ -45,13 +45,20 @@ export default async function Home({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const session = await getServerSession(nextAuthOptions);
+  const pageParam = searchParams['page'];
+  const sortParam = searchParams['sort'];
+  const directionParam = searchParams['direction'];
 
-  const sortParam = Array.isArray(searchParams['sort'])
-    ? null
-    : searchParams['sort'];
-  const directionParam = Array.isArray(searchParams['direction'])
-    ? null
-    : searchParams['direction'];
+  const page =
+    pageParam === undefined || Array.isArray(pageParam)
+      ? 1
+      : Number.isNaN(parseInt(pageParam))
+      ? 1
+      : parseInt(pageParam);
+
+  const sort = Array.isArray(sortParam) ? null : sortParam;
+
+  const direction = Array.isArray(directionParam) ? null : directionParam;
 
   // TODO: Actually get gists from gist service
   const gists = [
@@ -71,7 +78,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -81,7 +88,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -91,7 +98,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -101,7 +108,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -111,7 +118,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -121,7 +128,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -131,7 +138,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -141,7 +148,7 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
@@ -151,20 +158,20 @@ export default async function Home({
       username: 'sam_jackson',
       name: 'Sample Object 3',
       description: 'This is the third sample object',
-      formula: 'function(x) {\n  return Math.sin(x);\n}',
+      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
       updated: '2021-08-26',
       created: '2021-08-25',
     },
   ].sort((a, b) => {
-    if (sortParam === 'created' && directionParam === 'asc') {
+    if (sort === 'created' && direction === 'asc') {
       return new Date(a.created).getTime() - new Date(b.created).getTime();
     }
 
-    if (sortParam === 'updated' && directionParam === 'desc') {
+    if (sort === 'updated' && direction === 'desc') {
       return new Date(b.updated).getTime() - new Date(a.updated).getTime();
     }
 
-    if (sortParam === 'updated' && directionParam === 'asc') {
+    if (sort === 'updated' && direction === 'asc') {
       return new Date(a.updated).getTime() - new Date(b.updated).getTime();
     }
 
@@ -179,7 +186,7 @@ export default async function Home({
           <h1 className="text-lg font-bold">Discover gists</h1>
         </div>
         <div>
-          <SortDetails sortBy={sortParam} direction={directionParam} />
+          <SortDetails sortBy={sort} direction={direction} />
         </div>
       </div>
       <div className="flex flex-col w-full items-center justify-center gap-8 py-6 px-4">
@@ -207,7 +214,7 @@ export default async function Home({
                       </Link>
                       <span>/</span>
                       <Link
-                        href="#"
+                        href={`/gists/${gist.id}`}
                         className="text-primary-orange font-semibold hover:underline"
                       >
                         {gist.name}
@@ -224,7 +231,7 @@ export default async function Home({
                   </div>
                 </div>
               </div>
-              <Link href="#" className="relative">
+              <Link href={`/gists/${gist.id}`} className="relative">
                 <div className="border border-gray-600 rounded-md p-1 hover:border-primary-orange">
                   <Editor docState={gist.formula} readonly={true} />
                 </div>

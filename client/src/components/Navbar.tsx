@@ -125,7 +125,7 @@ export default function Navbar() {
           <div className="flex md:order-1">
             {status === 'authenticated' ? (
               <Link
-                href="#"
+                href="/gists/add"
                 className="flex w-full h-full items-center justify-center md:hidden py-2 pl-3 pr-4 text-primary-white hover:text-primary-orange"
               >
                 <AiOutlinePlus />
@@ -225,7 +225,7 @@ export default function Navbar() {
                 </li>
                 <li className="hidden md:block">
                   <Link
-                    href="#"
+                    href="/gists/add"
                     className="flex w-full h-full items-center justify-center p-0 text-primary-white hover:text-primary-orange"
                   >
                     <AiOutlinePlus />
