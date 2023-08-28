@@ -2,6 +2,7 @@
 
 import emailjs from '@emailjs/browser';
 import { Formik } from 'formik';
+import { CgSpinner } from 'react-icons/cg';
 import { toast } from 'react-toastify';
 import { object, string } from 'yup';
 
@@ -164,8 +165,11 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-primary-green px-2 py-1 text-sm font-semibold rounded-md hover:bg-secondary-green disabled:bg-secondary-gray"
+              className="flex items-center gap-2 bg-primary-green px-2 py-1 text-sm font-semibold rounded-md hover:bg-secondary-green disabled:bg-secondary-gray"
             >
+              {isSubmitting ? (
+                <CgSpinner className="animate-spin w-5 h-5" />
+              ) : null}
               Send Message
             </button>
           </div>
