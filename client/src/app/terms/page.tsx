@@ -2,10 +2,10 @@ import HeadingLinkButton from '@/components/HeadingLinkButton';
 
 export default function Terms() {
   return (
-    <div className="flex flex-col items-center flex-1 p-4 text-primary-white">
+    <main className="flex flex-col items-center flex-1 p-4 text-primary-white">
       <article className="flex flex-col gap-6 w-full max-w-4xl">
         <section className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold">Terms and Conditions</h1>
+          <h1 className="text-4xl font-bold">Terms and Conditions</h1>
           <p>Welcome to OnxGists!</p>
           <p>
             These terms and conditions outline the rules and regulations for the
@@ -304,6 +304,6 @@ export default function Terms() {
           </p>
         </section>
       </article>
-    </div>
+    </main>
   );
 }

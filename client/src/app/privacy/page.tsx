@@ -2,10 +2,10 @@ import HeadingLinkButton from '@/components/HeadingLinkButton';
 
 export default function Privacy() {
   return (
-    <div className="flex flex-col items-center flex-1 p-4 text-primary-white">
+    <main className="flex flex-col items-center flex-1 p-4 text-primary-white">
       <article className="flex flex-col gap-6 w-full max-w-4xl">
         <section className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold">Privacy Policy for OnxGists</h1>
+          <h1 className="text-4xl font-bold">Privacy Policy for OnxGists</h1>
           <p>
             At OnxGists, accessible from{' '}
             <a
@@ -158,6 +158,6 @@ export default function Privacy() {
           </p>
         </section>
       </article>
-    </div>
+    </main>
   );
 }
