@@ -93,10 +93,12 @@ export default function Editor({
   docState = '',
   setDocState,
   readonly = false,
+  className,
 }: {
   docState?: string;
   setDocState?: (state: string) => void;
   readonly?: boolean;
+  className?: string;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -110,10 +112,13 @@ export default function Editor({
         '&': {
           backgroundColor: '#24272d',
           color: '#d0d9e4',
+          height: '100%',
         },
         '.cm-content': {
           caretColor: '#f8f8f0',
         },
+        '.cm-content, .cm-gutter': { height: '100%' },
+        '.cm-scroller': { overflow: 'auto' },
         '.cm-cursor, .cm-dropCursor': {
           borderLeftColor: '#f8f8f0',
         },
@@ -122,11 +127,11 @@ export default function Editor({
             backgroundColor: '#2f333a',
           },
         '.cm-activeLine': {
-          backgroundColor: 'transparent',
+          backgroundColor: '#24272d',
         },
         '.cm-gutters': {
           border: 'none',
-          backgroundColor: 'transparent',
+          backgroundColor: '#24272d',
           color: 'd0d9e4',
         },
         '.cm-gutterElement>span': {
@@ -146,6 +151,7 @@ export default function Editor({
     );
 
     const tabSize = new Compartment();
+    const lineWrapping = new Compartment();
 
     const extensions = [
       basicSetup,
@@ -185,10 +191,10 @@ export default function Editor({
   }, [editorRef, docState, readonly, setDocState]);
 
   return (
-    <div className="flex flex-col flex-1 overflow-auto" ref={editorRef}>
-      <div className="flex items-center p-2 text-sm gap-2">
+    <div className={`${className} flex flex-col flex-grow h-0`} ref={editorRef}>
+      <div className="flex items-center justify-center p-2 text-sm gap-2">
         <CgSpinner className="animate-spin w-5 h-5" />
-        Loading gist...
+        {`Loading${docState ? ' gist' : ''}...`}
       </div>
     </div>
   );
