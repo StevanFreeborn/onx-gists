@@ -1,3 +1,17 @@
 export default function AddGist() {
-  return <h1>Add Gist</h1>;
+  return (
+    <main>
+      <form>
+        <div></div>
+        <div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div>
+          <button>Create gist</button>
+        </div>
+      </form>
+    </main>
+  );
 }
