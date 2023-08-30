@@ -3,7 +3,7 @@
 import { indentWithTab } from '@codemirror/commands';
 import { javascript } from '@codemirror/lang-javascript';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { Compartment, EditorState } from '@codemirror/state';
+import { Compartment, EditorState, Text } from '@codemirror/state';
 import {
   Decoration,
   MatchDecorator,
@@ -90,13 +90,13 @@ const highlightStyle = HighlightStyle.define([
 ]);
 
 export default function Editor({
-  docState = '',
+  docState = [''],
   setDocState,
   readonly = false,
   className,
 }: {
-  docState?: string;
-  setDocState?: (state: string) => void;
+  docState?: string[];
+  setDocState?: (state: string[]) => void;
   readonly?: boolean;
   className?: string;
 }) {
@@ -127,7 +127,7 @@ export default function Editor({
             backgroundColor: '#2f333a',
           },
         '.cm-activeLine': {
-          backgroundColor: '#24272d',
+          backgroundColor: 'transparent',
         },
         '.cm-gutters': {
           border: 'none',
@@ -168,13 +168,13 @@ export default function Editor({
     if (setDocState) {
       extensions.push(
         EditorView.updateListener.of(v => {
-          setDocState(v.state.doc.toString());
+          setDocState(v.state.doc.toJSON());
         })
       );
     }
 
     const editorState = EditorState.create({
-      doc: docState,
+      doc: Text.of(docState),
       extensions: extensions,
     });
 
@@ -188,7 +188,8 @@ export default function Editor({
     return () => {
       view.destroy();
     };
-  }, [editorRef, docState, readonly, setDocState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={`${className} flex flex-col flex-grow h-0`} ref={editorRef}>
