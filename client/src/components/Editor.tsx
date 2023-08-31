@@ -122,6 +122,9 @@ export default function Editor({
         '.cm-cursor, .cm-dropCursor': {
           borderLeftColor: '#f8f8f0',
         },
+        '&.cm-focused': {
+          outline: 'none',
+        },
         '&.cm-focused .cm-selectionBackground .cm-selectionBackground, .cm-content ::selection':
           {
             backgroundColor: '#2f333a',

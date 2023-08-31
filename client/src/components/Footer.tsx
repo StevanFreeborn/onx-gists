@@ -42,10 +42,7 @@ export default function Footer() {
           </Link>
         </div>
         <div>
-          <span className="self-center font-semibold whitespace-nowrap">
-            Onx
-          </span>
-          <span className="self-center whitespace-nowrap">Gists</span>
+          <span className="self-center whitespace-nowrap">OnxGists</span>
           <span> &copy; 2023</span>
         </div>
       </footer>

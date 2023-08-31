@@ -9,6 +9,7 @@ import GoogleProvider from 'next-auth/providers/google';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
+    userId?: string;
     apiJwt?: string;
     refreshErrored: boolean;
   }
@@ -102,6 +103,7 @@ export const nextAuthOptions: AuthOptions = {
         }
       }
 
+      session.userId = token.sub;
       session.refreshErrored = token.refreshErrored;
       return session;
     },

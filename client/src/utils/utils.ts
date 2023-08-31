@@ -16,3 +16,36 @@ export function toTitleCase(input: string) {
     .replace(/-/g, ' ')
     .replace(/\b\w/g, char => char.toUpperCase());
 }
+
+export function timeFromNow(date: string) {
+  const now = new Date();
+  const timestamp = new Date(date);
+  const secondsSince = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+
+  if (secondsSince < 60) {
+    return `${secondsSince} seconds ago`;
+  }
+
+  const minutes = Math.floor(secondsSince / 60);
+  if (minutes < 60) {
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+  }
+
+  const hours = Math.floor(secondsSince / 3600);
+  if (hours < 24) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+  }
+
+  const days = Math.floor(secondsSince / 86400);
+  if (days < 30) {
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  }
+
+  const months = Math.floor(secondsSince / 2592000);
+  if (months < 12) {
+    return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  }
+
+  const years = Math.floor(secondsSince / 31536000);
+  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+}
