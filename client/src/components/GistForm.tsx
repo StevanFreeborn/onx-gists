@@ -1,10 +1,27 @@
 'use client';
 
+import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import { CgSpinner } from 'react-icons/cg';
-import { object } from 'yup';
+import { object, string } from 'yup';
 import Editor from './Editor';
+
+enum Visibility {
+  private = 'private',
+  public = 'public',
+}
+
+enum LineWrapMode {
+  noWrap = 'noWrap',
+  softWrap = 'softWrap',
+}
+
+enum IndentSize {
+  two = 2,
+  four = 4,
+  eight = 8,
+}
 
 export default function GistForm() {
   const [editorState, setEditorState] = useState<string[]>(['']);
@@ -16,23 +33,33 @@ export default function GistForm() {
   const formFields = {
     name: '',
     description: '',
-    visibility: 'private',
-    lineWrapMode: 'no-wrap',
-    indentSize: 2,
+    visibility: Visibility.private,
+    lineWrapMode: LineWrapMode.noWrap,
+    indentSize: IndentSize.two,
   };
 
-  const formFieldKeys = Object.keys(formFields).reduce(
-    (prev, curr) => ({
-      ...prev,
-      [curr]: curr,
-    }),
-    {}
-  ) as {
-    [k in keyof typeof formFields]: k;
-  };
+  const formFieldKeys = getKeysFromObject(formFields);
 
   // TODO: Define valiation
-  const validationSchema = object();
+  const validationSchema = object({
+    [formFieldKeys.name]: string()
+      .required(`${toTitleCase(formFieldKeys.name)} is required`)
+      .max(
+        150,
+        `${toTitleCase(formFieldKeys.name)} should be 150 characters or less`
+      ),
+    [formFieldKeys.description]: string()
+      .required(`${toTitleCase(formFieldKeys.description)} is required`)
+      .max(
+        5000,
+        `${toTitleCase(
+          formFieldKeys.description
+        )} should be 5000 characters or less`
+      ),
+    [formFieldKeys.visibility]: string()
+      .required(`${toTitleCase(formFieldKeys.visibility)} is required`)
+      .oneOf(Object.values(Visibility)),
+  });
 
   return (
     <Formik
@@ -79,7 +106,7 @@ export default function GistForm() {
             />
           </div>
           <div className="flex flex-col flex-1">
-            <div className="flex items-start justify-between p-4 bg-secondary-gray border border-gray-600 rounded-t-md">
+            <div className="flex items-start justify-between px-4 py-2 bg-secondary-gray border border-gray-600 rounded-t-md">
               <input
                 type="text"
                 name={formFieldKeys.name}
@@ -117,8 +144,12 @@ export default function GistForm() {
                     onBlur={handleBlur}
                   >
                     <optgroup label="Line Wrap Mode">
-                      <option value="no-wrap">No wrap</option>
-                      <option value="soft-wrap">Soft wrap</option>
+                      <option value={LineWrapMode.noWrap}>
+                        {toTitleCase(LineWrapMode.noWrap)}
+                      </option>
+                      <option value={LineWrapMode.softWrap}>
+                        {toTitleCase(LineWrapMode.softWrap)}
+                      </option>
                     </optgroup>
                   </select>
                 </div>
@@ -127,7 +158,7 @@ export default function GistForm() {
             <Editor
               docState={editorState}
               setDocState={handleEditorChange}
-              className="border-x border-gray-600"
+              className="border-x border-gray-600 h-0"
             />
             <div className="p-2 bg-secondary-gray border border-gray-600 rounded-b-md text-sm">
               <span>Press Escape, then Tab or Shift+Tab to move focus.</span>
@@ -141,10 +172,16 @@ export default function GistForm() {
                   id={formFieldKeys.visibility}
                   className="rounded-md px-2 py-1 text-sm bg-secondary-gray text-primary-white border-r-8 border-transparent"
                   value={values.visibility}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                 >
                   <optgroup label="Visibility">
-                    <option value="private">Private</option>
-                    <option value="public">Public</option>
+                    <option value={Visibility.private}>
+                      {toTitleCase(Visibility.private)}
+                    </option>
+                    <option value={Visibility.public}>
+                      {toTitleCase(Visibility.public)}
+                    </option>
                   </optgroup>
                 </select>
               </div>

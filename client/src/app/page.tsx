@@ -1,6 +1,7 @@
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import Gist from '@/components/Gist';
 import SortDetails from '@/components/SortDetails';
+import { fakeGists } from '@/constants/constants';
 import { getServerSession } from 'next-auth';
 import { BsCode } from 'react-icons/bs';
 
@@ -26,109 +27,7 @@ export default async function Home({
   const direction = Array.isArray(directionParam) ? null : directionParam;
 
   // TODO: Actually get gists from gist service
-  const gists = [
-    {
-      id: '1',
-      userId: 'user456',
-      username: 'jane_smith',
-      name: 'Sample Object 2',
-      description: 'This is the second sample object',
-      formula: 'function(x) { return Math.pow(x, 2); }',
-      updated: '2022-08-26',
-      created: '2022-08-25',
-    },
-    {
-      id: '2',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula:
-        "function(x) {\n\tvar hello = 'hello';\n\tvar hello = 'hellooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooj';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\tvar hello = 'hello';\n\treturn Math.sin(x);\n}",
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '3',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '4',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '5',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '6',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '7',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '8',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '9',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-    {
-      id: '10',
-      userId: 'user789',
-      username: 'sam_jackson',
-      name: 'Sample Object 3',
-      description: 'This is the third sample object',
-      formula: 'function(x) {\n\treturn Math.sin(x);\n}',
-      updated: '2021-08-26',
-      created: '2021-08-25',
-    },
-  ].sort((a, b) => {
+  const sortedGists = [...fakeGists].sort((a, b) => {
     if (sort === 'created' && direction === 'asc') {
       return new Date(a.created).getTime() - new Date(b.created).getTime();
     }
@@ -156,7 +55,7 @@ export default async function Home({
         </div>
       </div>
       <div className="flex flex-col w-full items-center justify-center gap-8 py-6 px-4">
-        {gists.map(gist => {
+        {sortedGists.map(gist => {
           return <Gist key={gist.id} gist={gist} />;
         })}
         <div className="flex flex-col w-full gap-4 max-w-4xl">

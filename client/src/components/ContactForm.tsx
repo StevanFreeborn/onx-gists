@@ -1,26 +1,15 @@
 'use client';
 
+import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import emailjs from '@emailjs/browser';
 import { Formik } from 'formik';
 import { CgSpinner } from 'react-icons/cg';
 import { toast } from 'react-toastify';
 import { object, string } from 'yup';
 
-function toTitleCase(word: string) {
-  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-}
-
 export default function ContactForm() {
   const formFields = { name: '', email: '', subject: '', message: '' };
-  const formFieldKeys = Object.keys(formFields).reduce(
-    (prev, curr) => ({
-      ...prev,
-      [curr]: curr,
-    }),
-    {}
-  ) as {
-    [k in keyof typeof formFields]: k;
-  };
+  const formFieldKeys = getKeysFromObject(formFields);
 
   const validationSchema = object({
     [formFieldKeys.name]: string().required(

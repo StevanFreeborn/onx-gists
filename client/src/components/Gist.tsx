@@ -8,7 +8,7 @@ export type Gist = {
   username: string;
   name: string;
   description: string;
-  formula: string;
+  formula: string[];
   updated: string;
   created: string;
 };
