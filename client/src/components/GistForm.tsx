@@ -101,8 +101,8 @@ export default function GistForm({
           className="flex flex-col w-full flex-1 gap-4 max-w-4xl"
         >
           {isValid ? null : (
-            <div className="flex items-center justify-between p-4 bg-red-600 bg-opacity-25 border-y border-red-600">
-              <div>
+            <div className="flex items-center justify-between px-4 py-2 bg-red-600 bg-opacity-25 border-y border-red-600">
+              <div className="text-sm">
                 {Object.keys(errors).map(key => {
                   const errorObj = { ...errors } as { [key: string]: any };
                   const error = errorObj[key];
