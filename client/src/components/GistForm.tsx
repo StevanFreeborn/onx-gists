@@ -10,6 +10,8 @@ import { CgSpinner } from 'react-icons/cg';
 import { array, object, string } from 'yup';
 import Editor from './Editor';
 
+// const Editor = dynamic(() => import('./Editor'));
+
 export default function GistForm({
   gist,
   readOnly = false,
