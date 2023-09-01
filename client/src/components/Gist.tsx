@@ -20,7 +20,10 @@ export default function Gist({ gist }: { gist: Gist }) {
           </div>
           <div className="flex flex-col gap-1 text-sm">
             <div className="flex gap-1">
-              <Link href="#" className="text-primary-orange hover:underline">
+              <Link
+                href={`/${gist.userId}`}
+                className="text-primary-orange hover:underline"
+              >
                 {gist.username}
               </Link>
               <span>/</span>
