@@ -29,7 +29,13 @@ function SignOutButton() {
   );
 }
 
-function UserModal({ user }: { user: Session | null }) {
+function UserModal({
+  user,
+  linkClickHandler,
+}: {
+  user: Session | null;
+  linkClickHandler: () => void;
+}) {
   return (
     <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm z-50">
       <div className="p-3 border-b border-gray-600">
@@ -39,7 +45,8 @@ function UserModal({ user }: { user: Session | null }) {
       <ul className="flex flex-col gap-2 p-3 border-b border-gray-600">
         <li>
           <Link
-            href="#"
+            onClick={linkClickHandler}
+            href={`/${user?.userId}`}
             className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Your gists
@@ -47,6 +54,7 @@ function UserModal({ user }: { user: Session | null }) {
         </li>
         <li>
           <Link
+            onClick={linkClickHandler}
             href="#"
             className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
@@ -252,7 +260,10 @@ export default function Navbar() {
                     ref={userModalRef}
                     className={isUserModalOpen ? '' : 'hidden'}
                   >
-                    <UserModal user={session} />
+                    <UserModal
+                      user={session}
+                      linkClickHandler={() => setIsUserModalOpen(false)}
+                    />
                   </div>
                 </li>
               </>
