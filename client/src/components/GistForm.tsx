@@ -4,7 +4,6 @@ import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types/gist';
 import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';
-import { useState } from 'react';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { BsCode } from 'react-icons/bs';
 import { CgSpinner } from 'react-icons/cg';
@@ -71,7 +70,7 @@ export default function GistForm({
         try {
           // TODO: Post data to server
           await new Promise(resolve => setTimeout(resolve, 2000));
-          console.log({ ...values, editorState });
+          console.log({ ...values });
           // TODO: Redirect to newly created gist page
         } catch (error) {
           // TODO: Display server side errors
@@ -187,7 +186,7 @@ export default function GistForm({
               </div>
             </div>
             <Editor
-              docState={editorState}
+              docState={values.formula}
               setDocState={formula =>
                 setFieldValue(formFieldKeys.formula, formula)
               }
