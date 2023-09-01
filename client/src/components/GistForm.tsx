@@ -45,11 +45,15 @@ export default function GistForm({
           formFieldKeys.description
         )} should be 5000 characters or less`
       ),
-    [formFieldKeys.formula]: array().of(
-      string().required(
-        `${toTitleCase(formFieldKeys.formula)} can not be empty`
-      )
-    ),
+    [formFieldKeys.formula]: array()
+      .of(string())
+      .required(`${toTitleCase(formFieldKeys.formula)} can not be empty`)
+      .test(
+        'no-empty-formula',
+        `${toTitleCase(formFieldKeys.formula)} can not be empty`,
+        value =>
+          value.join('').trim() !== undefined && value.join('').trim() !== ''
+      ),
     [formFieldKeys.visibility]: string()
       .required(`${toTitleCase(formFieldKeys.visibility)} is required`)
       .oneOf(Object.values(Visibility)),
