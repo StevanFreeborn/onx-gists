@@ -188,7 +188,7 @@ export default function Navbar() {
             ) : status === 'unauthenticated' ? (
               <li>
                 <Link
-                  onClick={() => signIn()}
+                  onClick={async () => await signIn()}
                   href="#"
                   className="block py-2 pl-3 pr-4 text-primary-white rounded md:hover:bg-transparent md:hover:text-primary-orange md:p-0 hover:bg-primary-gray"
                 >

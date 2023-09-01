@@ -1,6 +1,8 @@
+import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistForm from '@/components/GistForm';
 import { fakeGists } from '@/constants/constants';
+import { Visibility } from '@/types/gist';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { BsFillTrashFill } from 'react-icons/bs';
@@ -11,8 +13,11 @@ export default async function EditGist({ params }: { params: { id: string } }) {
   const isCurrentUsersGist = gist?.userId === session?.userId;
 
   if (gist === undefined) {
-    // TODO: redirect to 404 page
-    return;
+    return <NotFound />;
+  }
+
+  if (isCurrentUsersGist === false && gist.visibility === Visibility.private) {
+    return <NotFound />;
   }
 
   return (

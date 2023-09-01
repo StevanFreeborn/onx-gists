@@ -125,7 +125,7 @@ export const fakeGists: Gist[] = [
     name: 'Sample Object 3',
     description: 'This is the third sample object',
     formula: ['function sayHi(greeting) {', '  console.log(greeting);', '}'],
-    visibility: Visibility.public,
+    visibility: Visibility.private,
     lineWrapMode: LineWrapMode.noWrap,
     indentSize: IndentSize.two,
     updated: '2021-08-26',

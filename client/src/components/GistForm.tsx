@@ -5,6 +5,7 @@ import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';
 import { useState } from 'react';
+import { BsCode } from 'react-icons/bs';
 import { CgSpinner } from 'react-icons/cg';
 import { array, object, string } from 'yup';
 import Editor from './Editor';
@@ -109,17 +110,20 @@ export default function GistForm({
           </div>
           <div className="flex flex-col flex-1">
             <div className="flex items-start justify-between px-4 py-2 bg-secondary-gray border border-gray-600 rounded-t-md">
-              <input
-                type="text"
-                name={formFieldKeys.name}
-                id={formFieldKeys.name}
-                placeholder="Gist name"
-                className="rounded-md p-2 text-sm bg-primary-gray text-primary-white border border-gray-600 read-only:bg-secondary-gray read-only:border-none read-only:p-0 read-only:text-primary-orange read-only:font-semibold read-only:text-sm read-only:pointer-events-none"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                readOnly={readOnly}
-              />
+              <div className="flex items-center gap-2">
+                {readOnly ? <BsCode className="w-5 h-5" /> : null}
+                <input
+                  type="text"
+                  name={formFieldKeys.name}
+                  id={formFieldKeys.name}
+                  placeholder="Gist name"
+                  className="rounded-md p-2 text-sm bg-primary-gray text-primary-white border border-gray-600 read-only:bg-secondary-gray read-only:border-none read-only:p-0 read-only:text-primary-orange read-only:font-semibold read-only:text-sm read-only:pointer-events-none"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  readOnly={readOnly}
+                />
+              </div>
               <div className="flex gap-4">
                 {readOnly ? null : (
                   <>
@@ -165,7 +169,9 @@ export default function GistForm({
             <Editor
               docState={editorState}
               setDocState={handleEditorChange}
-              className="border-x border-gray-600 h-0"
+              className={`border-x border-gray-600 ${
+                readOnly ? null : 'h-0 flex-grow'
+              }`}
               readonly={readOnly}
             />
             <div className="p-2 bg-secondary-gray border border-gray-600 rounded-b-md text-sm">

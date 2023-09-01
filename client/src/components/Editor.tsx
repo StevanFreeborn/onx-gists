@@ -195,7 +195,7 @@ export default function Editor({
   }, []);
 
   return (
-    <div className={`${className} flex flex-col flex-grow`} ref={editorRef}>
+    <div className={`${className} flex flex-col`} ref={editorRef}>
       <div className="flex items-center justify-center p-2 text-sm gap-2">
         <CgSpinner className="animate-spin w-5 h-5" />
         {`Loading${docState ? ' gist' : ''}...`}

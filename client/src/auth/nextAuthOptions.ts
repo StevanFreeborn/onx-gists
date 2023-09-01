@@ -108,6 +108,9 @@ export const nextAuthOptions: AuthOptions = {
       return session;
     },
   },
+  pages: {
+    signIn: '/login',
+  },
 };
 
 export function createApiJwt({ userId }: { userId: string }) {

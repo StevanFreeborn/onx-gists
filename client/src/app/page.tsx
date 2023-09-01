@@ -46,8 +46,8 @@ export default async function Home({
   return (
     <main className="flex flex-col flex-1 py-4 text-primary-white">
       <div className="flex w-full justify-between gap-2 items-center px-4 pb-4 border-b border-gray-600">
-        <div className="flex gap-2 items-center ">
-          <BsCode style={{ width: '30px', height: '30px' }} />
+        <div className="flex gap-2 items-center justify-center">
+          <BsCode className="w-8 h-8" />
           <h1 className="text-lg font-bold">Discover gists</h1>
         </div>
         <div>
@@ -59,6 +59,7 @@ export default async function Home({
           return <Gist key={gist.id} gist={gist} />;
         })}
         <div className="flex flex-col w-full gap-4 max-w-4xl">
+          {/* TODO: Determine page links based on current paging */}
           <div className="flex w-full items-center justify-center gap-4 pt-2">
             <a href="#" className="hover:text-primary-orange">
               Older

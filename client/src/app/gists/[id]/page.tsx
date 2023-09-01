@@ -1,6 +1,8 @@
+import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistForm from '@/components/GistForm';
 import { fakeGists } from '@/constants/constants';
+import { Visibility } from '@/types/gist';
 import { timeFromNow } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
@@ -13,14 +15,17 @@ export default async function ViewGist({ params }: { params: { id: string } }) {
   const isCurrentUsersGist = gist?.userId === session?.userId;
 
   if (gist === undefined) {
-    // TODO: redirect to 404 page
-    return;
+    return <NotFound />;
+  }
+
+  if (isCurrentUsersGist === false && gist.visibility === Visibility.private) {
+    return <NotFound />;
   }
 
   return (
     <main className="flex flex-col w-full h-full p-4 items-center text-primary-white">
       <div className="flex w-full items-start justify-between pt-2 pb-6 border-b border-gray-600">
-        <div className="flex gap-2">
+        <div className="flex items-start gap-2">
           <div>
             <Image
               src={'https://placehold.co/400'}
@@ -50,6 +55,11 @@ export default async function ViewGist({ params }: { params: { id: string } }) {
               <div className="text-xs text-gray-500">
                 Updated {timeFromNow(gist.updated)}
               </div>
+            </div>
+          </div>
+          <div>
+            <div className="border border-gray-600 rounded-full px-2 py-1 text-xs">
+              {gist.visibility}
             </div>
           </div>
         </div>
