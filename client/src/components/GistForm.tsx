@@ -5,6 +5,7 @@ import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';
 import { useState } from 'react';
+import { AiFillCloseCircle } from 'react-icons/ai';
 import { BsCode } from 'react-icons/bs';
 import { CgSpinner } from 'react-icons/cg';
 import { array, object, string } from 'yup';
@@ -28,12 +29,6 @@ export default function GistForm({
 
   const formFieldKeys = getKeysFromObject(formFields);
 
-  const [editorState, setEditorState] = useState<string[]>(formFields.formula);
-
-  function handleEditorChange(docState: string[]) {
-    setEditorState(docState);
-  }
-
   const validationSchema = object({
     [formFieldKeys.name]: string()
       .required(`${toTitleCase(formFieldKeys.name)} is required`)
@@ -49,9 +44,11 @@ export default function GistForm({
           formFieldKeys.description
         )} should be 5000 characters or less`
       ),
-    [formFieldKeys.formula]: array()
-      .of(string())
-      .required(`A ${toTitleCase(formFieldKeys.formula)} is required`),
+    [formFieldKeys.formula]: array().of(
+      string().required(
+        `${toTitleCase(formFieldKeys.formula)} can not be empty`
+      )
+    ),
     [formFieldKeys.visibility]: string()
       .required(`${toTitleCase(formFieldKeys.visibility)} is required`)
       .oneOf(Object.values(Visibility)),
@@ -68,6 +65,8 @@ export default function GistForm({
       enableReinitialize={true}
       initialValues={formFields}
       validationSchema={validationSchema}
+      validateOnBlur={false}
+      validateOnChange={false}
       onSubmit={async (values, { setSubmitting, resetForm }) => {
         try {
           // TODO: Post data to server
@@ -84,17 +83,38 @@ export default function GistForm({
       {({
         values,
         errors,
-        touched,
         isSubmitting,
+        isValid,
         handleSubmit,
         handleChange,
         handleBlur,
+        setErrors,
+        setFieldValue,
       }) => (
-        // TODO: display validation errors
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-full flex-1 gap-4 max-w-4xl"
         >
+          {isValid ? null : (
+            <div className="flex items-center justify-between p-4 bg-red-600 bg-opacity-25 border-y border-red-600">
+              <div>
+                {Object.keys(errors).map(key => {
+                  const errorObj = { ...errors } as { [key: string]: any };
+                  const error = errorObj[key];
+                  return <p key={key}>{error}</p>;
+                })}
+              </div>
+              <div>
+                <button
+                  onClick={() => setErrors({})}
+                  className="flex items-center justify-center text-red-600 hover:text-primary-white"
+                  type="button"
+                >
+                  <AiFillCloseCircle />
+                </button>
+              </div>
+            </div>
+          )}
           <div>
             <input
               type="text"
@@ -168,7 +188,9 @@ export default function GistForm({
             </div>
             <Editor
               docState={editorState}
-              setDocState={handleEditorChange}
+              setDocState={formula =>
+                setFieldValue(formFieldKeys.formula, formula)
+              }
               className={`border-x border-gray-600 ${
                 readOnly ? null : 'h-0 flex-grow'
               }`}
@@ -193,7 +215,7 @@ export default function GistForm({
                     onBlur={handleBlur}
                   >
                     <optgroup label="Visibility">
-                      <option value={Visibility.private}>
+                      <option value={''}>
                         {toTitleCase(Visibility.private)}
                       </option>
                       <option value={Visibility.public}>
