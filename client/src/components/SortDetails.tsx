@@ -1,16 +1,10 @@
 'use client';
 
+import { SortOrders } from '@/enums/sortOrders';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { AiFillCaretDown } from 'react-icons/ai';
 import { GiCheckMark } from 'react-icons/gi';
-
-enum SortOrders {
-  createdDescending = 'created-desc',
-  createdAscending = 'created-asc',
-  updatedDescending = 'updated-desc',
-  updatedAscending = 'updated-asc',
-}
 
 function SortLink({
   currentLinkKey,

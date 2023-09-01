@@ -1,3 +1,4 @@
+import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/providers/AuthProvider';
@@ -20,7 +21,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
+  const session = await getServerSession(nextAuthOptions);
+
   return (
     <AuthProvider session={session}>
       <html lang="en" className="w-full h-full">

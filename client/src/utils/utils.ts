@@ -1,3 +1,6 @@
+import { SortOrders } from '@/enums/sortOrders';
+import { Gist } from '@/types/gist';
+
 export function getKeysFromObject<T>(formFields: T) {
   return Object.keys(formFields as object).reduce(
     (prev, curr) => ({
@@ -48,4 +51,51 @@ export function timeFromNow(date: string) {
 
   const years = Math.floor(secondsSince / 31536000);
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+}
+
+export function sortGists(
+  gists: Gist[],
+  sort: string | null | undefined,
+  direction: string | null | undefined
+) {
+  const sortOrder = `${sort}-${direction}`;
+
+  return [...gists].sort((a, b) => {
+    if (sortOrder === SortOrders.createdAscending) {
+      return new Date(a.created).getTime() - new Date(b.created).getTime();
+    }
+
+    if (sortOrder === SortOrders.updatedDescending) {
+      return new Date(b.updated).getTime() - new Date(a.updated).getTime();
+    }
+
+    if (sortOrder === SortOrders.updatedAscending) {
+      return new Date(a.updated).getTime() - new Date(b.updated).getTime();
+    }
+
+    return new Date(b.created).getTime() - new Date(a.created).getTime();
+  });
+}
+
+type SearchParams = {
+  [key: string]: string | string[] | undefined;
+};
+
+export function getPageQueryParam(searchParams: SearchParams) {
+  const pageParam = searchParams['page'];
+  return pageParam === undefined || Array.isArray(pageParam)
+    ? 1
+    : Number.isNaN(parseInt(pageParam))
+    ? 1
+    : parseInt(pageParam);
+}
+
+export function getSortQueryParam(searchParams: SearchParams) {
+  const sortParam = searchParams['sort'];
+  return Array.isArray(sortParam) ? null : sortParam;
+}
+
+export function getDirectionQueryParam(searchParams: SearchParams) {
+  const directionParam = searchParams['direction'];
+  return Array.isArray(directionParam) ? null : directionParam;
 }
