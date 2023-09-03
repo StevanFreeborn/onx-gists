@@ -1,31 +1,32 @@
-'use client';
+import GistsPage from '@/components/GistsPage';
+import { fakeGists } from '@/constants/constants';
+import {
+  getDirectionQueryParam,
+  getPageQueryParam,
+  getSortQueryParam,
+  sortGists,
+} from '@/utils/utils';
 
-import { useUserSession } from '@/auth/useUserSession';
-import { signIn, signOut } from 'next-auth/react';
+export const dynamic = 'force-dynamic';
 
-export default function Home() {
-  const session = useUserSession();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const page = getPageQueryParam(searchParams);
+  const sort = getSortQueryParam(searchParams);
+  const direction = getDirectionQueryParam(searchParams);
 
-  async function callApi() {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL ?? '', {
-      headers: {
-        Authorization: `Bearer ${session.data?.apiJwt}`,
-      },
-    });
-  }
+  // TODO: Actually get gists from gist service
+  const sortedGists = sortGists(fakeGists, sort, direction);
 
   return (
-    <main className=''>
-      <div>
-        {session.status === 'authenticated' ? (
-          <button onClick={() => signOut()}>Sign Out</button>
-        ) : (
-          <button onClick={() => signIn()}>Sign In</button>
-        )}
-      </div>
-      <div>
-        <button onClick={() => callApi()}>Call Api</button>
-      </div>
-    </main>
+    <GistsPage
+      heading="Discover gists"
+      sort={sort}
+      direction={direction}
+      gists={sortedGists}
+    />
   );
 }

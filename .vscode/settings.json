@@ -1,5 +1,17 @@
 {
   "dotnet.defaultSolution": "server/Server.sln",
   "css.lint.unknownAtRules": "ignore",
-  "cSpell.words": ["NEXTAUTH", "tailwindcss"]
+  "cSpell.words": [
+    "childrens",
+    "codemirror",
+    "formik",
+    "keymap",
+    "lezer",
+    "NEXTAUTH",
+    "nextjs",
+    "nprogress",
+    "tailwindcss",
+    "toastify",
+    "toploader"
+  ]
 }
