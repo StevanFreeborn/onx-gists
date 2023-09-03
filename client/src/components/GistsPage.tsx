@@ -22,6 +22,8 @@ export default function GistsPage({
   direction: Param;
   gists: GistType[];
 }) {
+  // TODO: If there are no gists display some sort of place holder
+
   return (
     <main className="flex flex-col h-full flex-1 py-4 text-primary-white">
       <div className="flex w-full justify-between gap-2 items-center px-4 pb-4 border-b border-gray-600">
@@ -40,6 +42,8 @@ export default function GistsPage({
         {gists.map(gist => {
           return <Gist key={gist.id} gist={gist} />;
         })}
+        {/* TODO: If there is not multiple pages don't display */}
+        {/* TODO: Figure out what params to pass to pager */}
         <div className="flex flex-col w-full gap-4 max-w-4xl">
           <Pager />
         </div>
