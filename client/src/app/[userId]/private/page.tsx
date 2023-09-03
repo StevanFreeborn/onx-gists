@@ -6,13 +6,12 @@ import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
-  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
-export default async function UsersGists({
+export default async function UsersPrivateGists({
   params,
   searchParams,
 }: {
@@ -30,22 +29,24 @@ export default async function UsersGists({
 
   // TODO: Actually get gists from gist service
   const filteredGists = isCurrentUsersPage
-    ? fakeGists.filter(gist => gist.userId === params.userId)
+    ? fakeGists.filter(
+        gist =>
+          gist.userId === params.userId &&
+          gist.visibility === Visibility.private
+      )
     : fakeGists.filter(
         gist =>
           gist.userId === params.userId && gist.visibility === Visibility.public
       );
 
-  const sortedGists = sortGists(filteredGists, sort, direction);
-
   return (
     <GistsPage
-      heading={isCurrentUsersPage ? 'Your gists' : `${user?.username}'s gists`}
+      heading={isCurrentUsersPage ? 'Your gists' : `${user?.username} gists`}
       isCurrentUsersPage={isCurrentUsersPage}
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
-      gists={sortedGists}
+      gists={filteredGists}
     />
   );
 }

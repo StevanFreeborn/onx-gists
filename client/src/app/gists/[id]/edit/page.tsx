@@ -7,6 +7,8 @@ import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { BsFillTrashFill } from 'react-icons/bs';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
   const gist = fakeGists.find(gist => gist.id === params.id);

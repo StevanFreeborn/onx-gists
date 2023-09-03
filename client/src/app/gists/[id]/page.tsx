@@ -9,6 +9,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { BsFillPencilFill, BsFillTrashFill } from 'react-icons/bs';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ViewGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
   const gist = fakeGists.find(gist => gist.id === params.id);

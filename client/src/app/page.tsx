@@ -1,5 +1,4 @@
-import Gist from '@/components/Gist';
-import SortDetails from '@/components/SortDetails';
+import GistsPage from '@/components/GistsPage';
 import { fakeGists } from '@/constants/constants';
 import {
   getDirectionQueryParam,
@@ -7,7 +6,8 @@ import {
   getSortQueryParam,
   sortGists,
 } from '@/utils/utils';
-import { BsCode } from 'react-icons/bs';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home({
   searchParams,
@@ -22,33 +22,11 @@ export default async function Home({
   const sortedGists = sortGists(fakeGists, sort, direction);
 
   return (
-    <main className="flex flex-col h-full flex-1 py-4 text-primary-white">
-      <div className="flex w-full justify-between gap-2 items-center px-4 pb-4 border-b border-gray-600">
-        <div className="flex gap-2 items-center justify-center">
-          <BsCode className="w-8 h-8" />
-          <h1 className="text-lg font-bold">Discover gists</h1>
-        </div>
-        <div>
-          <SortDetails sortBy={sort} direction={direction} />
-        </div>
-      </div>
-      <div className="flex flex-col flex-1 w-full items-center gap-8 py-6 px-4">
-        {sortedGists.map(gist => {
-          return <Gist key={gist.id} gist={gist} />;
-        })}
-        <div className="flex flex-col w-full gap-4 max-w-4xl">
-          {/* TODO: Determine page links based on current paging */}
-          {/* TODO: Hider page component if only one page */}
-          <div className="flex w-full items-center justify-center gap-4 pt-2">
-            <a href="#" className="hover:text-primary-orange">
-              Older
-            </a>
-            <a href="#" className="hover:text-primary-orange">
-              Newer
-            </a>
-          </div>
-        </div>
-      </div>
-    </main>
+    <GistsPage
+      heading="Discover gists"
+      sort={sort}
+      direction={direction}
+      gists={sortedGists}
+    />
   );
 }

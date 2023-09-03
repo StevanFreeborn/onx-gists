@@ -10,9 +10,9 @@ import {
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
-export default async function UsersGists({
+export default async function UsersPublicGists({
   params,
   searchParams,
 }: {
@@ -30,7 +30,10 @@ export default async function UsersGists({
 
   // TODO: Actually get gists from gist service
   const filteredGists = isCurrentUsersPage
-    ? fakeGists.filter(gist => gist.userId === params.userId)
+    ? fakeGists.filter(
+        gist =>
+          gist.userId === params.userId && gist.visibility === Visibility.public
+      )
     : fakeGists.filter(
         gist =>
           gist.userId === params.userId && gist.visibility === Visibility.public

@@ -52,7 +52,8 @@ function UserModal({
             Your gists
           </Link>
         </li>
-        <li>
+        {/* TODO: Implement starring gists */}
+        {/* <li>
           <Link
             onClick={linkClickHandler}
             href="#"
@@ -60,7 +61,7 @@ function UserModal({
           >
             Starred gists
           </Link>
-        </li>
+        </li> */}
       </ul>
       <div className="p-3">
         <SignOutButton />
