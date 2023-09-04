@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
@@ -33,30 +35,27 @@ builder.Services.AddCors(
   )
 );
 
-builder.Services.AddCors(
-  options => options.AddPolicy(
-    "production",
-    policy => policy
-      .AllowCredentials()
-      .AllowAnyHeader()
-      .AllowAnyMethod()
-      .WithOrigins(
-        new[] { "https://onxgists.stevanfreeborn.com", "https://onx-gists-client.vercel.app" }
-      )
-  )
-);
+builder.Services.AddScoped<IValidator<NewGistDto>, NewGistDtoValidator>();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!").RequireAuthorization();
+app.MapGet("/ping", () => new { Message = "I'm alive!" });
+
+app.MapPost("/gists", async (NewGistDto newGistDto, [FromServices] IValidator<NewGistDto> validator) =>
+{
+  var validationResult = await validator.ValidateAsync(newGistDto);
+
+  if (validationResult.IsValid == false)
+  {
+    return Results.ValidationProblem(validationResult.ToDictionary());
+  }
+
+  return Results.Ok(newGistDto);
+});
 
 if (app.Environment.IsDevelopment())
 {
   app.UseCors("development");
-}
-else
-{
-  app.UseCors("production");
 }
 
 app.UseAuthentication();
