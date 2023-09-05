@@ -46,9 +46,13 @@ var app = builder.Build();
 
 app
   .MapGet("/ping", () => new { Message = "I'm alive!" })
-  .WithName("Ping");
+  .WithName("Ping")
+  .WithDescription("Indicates if the gist service is up");
 
-app.MapGet("/gists/{id}", (string id) => id).WithName("GetGistById");
+app
+  .MapGet("/gists/{id}", (string id) => id)
+  .WithName("GetGistById")
+  .WithDescription("Gets the gist with the given id from the database");
 
 app
   .MapPost("/gists", async (NewGistDto newGistDto, [FromServices] IValidator<NewGistDto> validator, [FromServices] IGistRepository repository) =>
@@ -80,7 +84,8 @@ app
       value: createResult.Value
     );
   })
-  .WithName("AddGist");
+  .WithName("AddGist")
+  .WithDescription("Stores the given gist in the database");
 
 if (app.Environment.IsDevelopment())
 {
