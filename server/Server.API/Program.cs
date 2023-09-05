@@ -84,6 +84,7 @@ app
       value: createResult.Value
     );
   })
+  .RequireAuthorization()
   .WithName("AddGist")
   .WithDescription("Stores the given gist in the database");
 

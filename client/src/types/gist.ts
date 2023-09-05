@@ -15,15 +15,17 @@ export enum IndentSize {
 }
 
 export type Gist = {
-  id: string;
-  userId: string;
-  username: string;
+  id?: string;
+  userId?: string;
+  username?: string;
   name: string;
   description: string;
   formula: string[];
   visibility: Visibility;
   lineWrapMode: LineWrapMode;
   indentSize: IndentSize;
-  updated: string;
-  created: string;
+  updated?: string;
+  created?: string;
 };
+
+export type CreatedOrUpdatedGist = Omit<Gist, 'username'>;
