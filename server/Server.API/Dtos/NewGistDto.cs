@@ -1,8 +1,7 @@
-using System.Data;
 
 namespace Server.API.Dtos;
 
-public class NewGistDto
+class NewGistDto
 {
   public string UserId { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;
@@ -11,9 +10,23 @@ public class NewGistDto
   public string Visibility { get; set; } = string.Empty;
   public string LineWrapMode { get; set; } = string.Empty;
   public int IndentSize { get; set; }
+
+  internal Gist ToGist()
+  {
+    return new Gist
+    {
+      UserId = UserId,
+      Name = Name,
+      Description = Description,
+      Formula = Formula,
+      Visibility = Visibility,
+      LineWrapMode = LineWrapMode,
+      IndentSize = IndentSize
+    };
+  }
 }
 
-public class NewGistDtoValidator : AbstractValidator<NewGistDto>
+class NewGistDtoValidator : AbstractValidator<NewGistDto>
 {
   public NewGistDtoValidator()
   {

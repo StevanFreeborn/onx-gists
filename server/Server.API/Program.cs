@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Server.API.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
@@ -35,23 +37,50 @@ builder.Services.AddCors(
   )
 );
 
+builder.Services.Configure<DbOptions>(config.GetSection(nameof(DbOptions)));
+builder.Services.AddSingleton<DbContext>();
+builder.Services.AddScoped<IGistRepository, GistRepository>();
 builder.Services.AddScoped<IValidator<NewGistDto>, NewGistDtoValidator>();
 
 var app = builder.Build();
 
-app.MapGet("/ping", () => new { Message = "I'm alive!" });
+app
+  .MapGet("/ping", () => new { Message = "I'm alive!" })
+  .WithName("Ping");
 
-app.MapPost("/gists", async (NewGistDto newGistDto, [FromServices] IValidator<NewGistDto> validator) =>
-{
-  var validationResult = await validator.ValidateAsync(newGistDto);
+app.MapGet("/gists/{id}", (string id) => id).WithName("GetGistById");
 
-  if (validationResult.IsValid == false)
+app
+  .MapPost("/gists", async (NewGistDto newGistDto, [FromServices] IValidator<NewGistDto> validator, [FromServices] IGistRepository repository) =>
   {
-    return Results.ValidationProblem(validationResult.ToDictionary());
-  }
+    var validationResult = await validator.ValidateAsync(newGistDto);
 
-  return Results.Ok(newGistDto);
-});
+    if (validationResult.IsValid == false)
+    {
+      return Results.ValidationProblem(validationResult.ToDictionary());
+    }
+
+    var newGist = newGistDto.ToGist();
+
+    var createResult = await repository.CreateAsync(newGist);
+
+    if (createResult.IsFailed)
+    {
+      var error = createResult.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to create new gist",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    return Results.CreatedAtRoute(
+      routeName: "GetGistById",
+      routeValues: new { createResult.Value.Id },
+      value: createResult.Value
+    );
+  })
+  .WithName("AddGist");
 
 if (app.Environment.IsDevelopment())
 {
