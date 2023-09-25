@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Server.API.Data;
+using Server.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -50,7 +51,13 @@ app
   .WithDescription("Indicates if the gist service is up");
 
 app
-  .MapGet("/gists/{id}", (string id) => id)
+  .MapGet("/gists/{id}", (HttpContext context, string id) =>
+  {
+
+    var userId = context.GetUserId();
+    return Results.Ok(userId);
+  })
+  .RequireAuthorization()
   .WithName("GetGistById")
   .WithDescription("Gets the gist with the given id from the database");
 
