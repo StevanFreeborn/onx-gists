@@ -62,8 +62,25 @@ app
   .WithDescription("Gets the gist with the given id from the database");
 
 app
-  .MapPost("/gists", async (NewGistDto newGistDto, [FromServices] IValidator<NewGistDto> validator, [FromServices] IGistRepository repository) =>
+  .MapPost("/gists", async (
+    HttpContext context,
+    NewGistDto newGistDto,
+    [FromServices] IValidator<NewGistDto> validator,
+    [FromServices] IGistRepository repository
+  ) =>
   {
+    var userId = context.GetUserId();
+
+    if (userId == null)
+    {
+      return Results.Unauthorized();
+    }
+
+    if (newGistDto.UserId != userId)
+    {
+      return Results.Forbid();
+    }
+
     var validationResult = await validator.ValidateAsync(newGistDto);
 
     if (validationResult.IsValid == false)
