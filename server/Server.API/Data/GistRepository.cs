@@ -22,4 +22,17 @@ class GistRepository : IGistRepository
       return Result.Fail(ex.Message);
     }
   }
+
+  public async Task<Result<Gist?>> GetByIdAsync(string id)
+  {
+    try
+    {
+      var gist = await _context.Gists.Find(gist => gist.Id == id).FirstOrDefaultAsync();
+      return Result.Ok<Gist?>(gist);
+    }
+    catch (Exception ex)
+    {
+      return Result.Fail(ex.Message);
+    }
+  }
 }

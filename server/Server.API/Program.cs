@@ -51,11 +51,42 @@ app
   .WithDescription("Indicates if the gist service is up");
 
 app
-  .MapGet("/gists/{id}", (HttpContext context, string id) =>
+  .MapGet("/gists/{id}", async (
+    HttpContext context,
+    string id,
+    [FromServices] IGistRepository repository
+  ) =>
   {
-
     var userId = context.GetUserId();
-    return Results.Ok(userId);
+
+    if (userId == null)
+    {
+      return Results.Unauthorized();
+    }
+
+    var gist = await repository.GetByIdAsync(id);
+
+    if (gist.IsFailed)
+    {
+      var error = gist.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to get gist",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    if (gist.Value == null)
+    {
+      return Results.NotFound();
+    }
+
+    if (gist.Value.UserId != userId && gist.Value.Visibility == "private")
+    {
+      return Results.Forbid();
+    }
+
+    return Results.Ok(gist.Value);
   })
   .RequireAuthorization()
   .WithName("GetGistById")
