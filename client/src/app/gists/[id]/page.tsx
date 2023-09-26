@@ -12,6 +12,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { BsFillPencilFill } from 'react-icons/bs';
 
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export default async function ViewGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
   const { getGist } = gistService(

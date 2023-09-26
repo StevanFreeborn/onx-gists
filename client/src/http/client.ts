@@ -11,6 +11,7 @@ export function client(clientConfig?: {
         ...clientConfig?.authHeader,
       },
       credentials: 'include' as RequestCredentials,
+      cache: 'no-store' as RequestCache,
     };
 
     const request = new Request(url, requestConfig);

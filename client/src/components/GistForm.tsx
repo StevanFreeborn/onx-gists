@@ -101,6 +101,7 @@ export default function GistForm({
         }
 
         router.push(`/gists/${result.value.id}`);
+        router.refresh();
       }}
     >
       {({
