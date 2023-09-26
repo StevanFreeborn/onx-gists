@@ -2,7 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Web API",
+      "name": "Client",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/client",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithEdge"
+      },
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Server",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
@@ -12,12 +25,14 @@
       "stopAtEntry": false,
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
+      },
+      "internalConsoleOptions": "neverOpen"
+    }
+  ],
+  "compounds": [
     {
-      "name": ".NET Core Attach",
-      "type": "coreclr",
-      "request": "attach"
+      "name": "Client + Server",
+      "configurations": ["Client", "Server"]
     }
   ]
 }

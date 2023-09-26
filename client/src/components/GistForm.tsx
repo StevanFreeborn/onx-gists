@@ -14,8 +14,6 @@ import { toast } from 'react-toastify';
 import { array, object, string } from 'yup';
 import Editor from './Editor';
 
-// const Editor = dynamic(() => import('./Editor'));
-
 export default function GistForm({
   gist,
   readOnly = false,
@@ -24,7 +22,7 @@ export default function GistForm({
   readOnly?: boolean;
 }) {
   const { user, client } = useAuthClient();
-  const { addGist } = gistService(client);
+  const { addGist, updateGist } = gistService(client);
   const router = useRouter();
   const formFields = gist ?? {
     name: '',
@@ -80,13 +78,26 @@ export default function GistForm({
       validateOnBlur={false}
       validateOnChange={false}
       onSubmit={async (values, { setSubmitting, resetForm }) => {
-        const newGist = { ...values, userId: user.userId };
-        const result = await addGist(newGist);
+        let result;
 
-        if (result.ok === false) {
-          toast.error(result.error.message);
-          setSubmitting(false);
-          return;
+        if (gist === undefined) {
+          const newGist = { ...values, userId: user.userId! };
+          result = await addGist(newGist);
+
+          if (result.ok === false) {
+            toast.error(result.error.message);
+            setSubmitting(false);
+            return;
+          }
+        } else {
+          const updatedGist = { ...gist, ...values };
+          result = await updateGist(updatedGist);
+
+          if (result.ok === false) {
+            toast.error(result.error.message);
+            setSubmitting(false);
+            return;
+          }
         }
 
         router.push(`/gists/${result.value.id}`);

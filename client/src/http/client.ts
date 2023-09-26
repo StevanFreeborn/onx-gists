@@ -51,7 +51,7 @@ export function client(clientConfig?: {
   }) {
     const requestConfig = {
       ...config,
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify(body),
     };
     return await request(url, requestConfig);

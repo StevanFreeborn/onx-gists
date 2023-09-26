@@ -1,9 +1,11 @@
 import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistForm from '@/components/GistForm';
-import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { client } from '@/http/client';
+import { gistService } from '@/services/gistService';
+import { Visibility, createGist } from '@/types/gist';
 import { timeFromNow } from '@/utils/utils';
+import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,14 +15,32 @@ export const dynamic = 'force-dynamic';
 
 export default async function ViewGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
-  const gist = fakeGists.find(gist => gist.id === params.id);
-  const isCurrentUsersGist = gist?.userId === session?.userId;
+  const { getGist } = gistService(
+    client({ authHeader: { Authorization: `Bearer ${session?.apiJwt}` } })
+  );
+  const gistResult = await getGist(params.id);
 
-  if (gist === undefined) {
+  if (gistResult.ok === false) {
     return <NotFound />;
   }
 
-  if (isCurrentUsersGist === false && gist.visibility === Visibility.private) {
+  const gistDto = gistResult.value;
+  const gistUser = await new PrismaClient().user.findUnique({
+    where: { id: gistDto.userId },
+  });
+
+  if (gistUser === null) {
+    return <NotFound />;
+  }
+
+  const gist = createGist(gistDto, gistUser);
+
+  const isCurrentUsersGist = gist.userId === session?.userId;
+
+  if (
+    isCurrentUsersGist === false &&
+    gistResult.value.visibility === Visibility.private
+  ) {
     return <NotFound />;
   }
 
@@ -30,7 +50,7 @@ export default async function ViewGist({ params }: { params: { id: string } }) {
         <div className="flex items-start gap-2">
           <div>
             <Image
-              src={'https://placehold.co/400'}
+              src={gist.userImage}
               alt="User Image"
               width={32}
               height={32}

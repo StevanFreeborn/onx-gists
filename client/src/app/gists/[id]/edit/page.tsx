@@ -1,8 +1,10 @@
 import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistForm from '@/components/GistForm';
-import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { client } from '@/http/client';
+import { gistService } from '@/services/gistService';
+import { Visibility, createGist } from '@/types/gist';
+import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { BsFillTrashFill } from 'react-icons/bs';
@@ -11,12 +13,27 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
-  const gist = fakeGists.find(gist => gist.id === params.id);
-  const isCurrentUsersGist = gist?.userId === session?.userId;
+  const { getGist } = gistService(
+    client({ authHeader: { Authorization: `Bearer ${session?.apiJwt}` } })
+  );
+  const gistResult = await getGist(params.id);
 
-  if (gist === undefined) {
+  if (gistResult.ok === false) {
     return <NotFound />;
   }
+
+  const gistDto = gistResult.value;
+  const gistUser = await new PrismaClient().user.findUnique({
+    where: { id: gistDto.userId },
+  });
+
+  if (gistUser === null) {
+    return <NotFound />;
+  }
+
+  const gist = createGist(gistDto, gistUser);
+
+  const isCurrentUsersGist = gist.userId === session?.userId;
 
   if (isCurrentUsersGist === false && gist.visibility === Visibility.private) {
     return <NotFound />;

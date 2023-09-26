@@ -3,6 +3,7 @@ import { client } from '@/http/client';
 
 export function useAuthClient() {
   const { data } = useUserSession();
+
   const user = data?.user;
   const userId = data?.userId;
   const token = data?.apiJwt;
