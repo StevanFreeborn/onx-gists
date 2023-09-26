@@ -1,5 +1,6 @@
 import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
+import DeleteButton from '@/components/DeleteButton';
 import GistForm from '@/components/GistForm';
 import { client } from '@/http/client';
 import { gistService } from '@/services/gistService';
@@ -7,9 +8,6 @@ import { Visibility, createGist } from '@/types/gist';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
-import { BsFillTrashFill } from 'react-icons/bs';
-
-export const dynamic = 'force-dynamic';
 
 export default async function EditGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
@@ -54,13 +52,7 @@ export default async function EditGist({ params }: { params: { id: string } }) {
           </div>
           {isCurrentUsersGist ? (
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                className="flex items-center justify-center gap-1 px-2 py-1 rounded-md text-sm bg-secondary-gray border border-gray-600 hover:bg-red-600 hover:text-primary-white group/delete"
-              >
-                <BsFillTrashFill className="w-3 h-3 text-red-600 group-hover/delete:text-primary-white" />
-                Delete
-              </button>
+              <DeleteButton id={gist.id} />
             </div>
           ) : null}
         </div>

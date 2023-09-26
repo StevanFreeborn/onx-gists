@@ -53,9 +53,22 @@ export function gistService(client: Client) {
     return { ok: true, value: await response.json() };
   }
 
+  async function deleteGist(id: string): Promise<Result<true>> {
+    const response = await client.delete({
+      url: `${baseUrl}/gists/${id}`,
+    });
+
+    if (response.ok === false) {
+      return { ok: false, error: new Error('Failed to delete gist.') };
+    }
+
+    return { ok: true, value: true };
+  }
+
   return {
     addGist,
     getGist,
     updateGist,
+    deleteGist,
   };
 }

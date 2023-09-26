@@ -1,6 +1,3 @@
-
-using System.Reflection.Metadata;
-
 namespace Server.API.Data;
 
 class GistRepository : IGistRepository
@@ -18,6 +15,19 @@ class GistRepository : IGistRepository
     {
       await _context.Gists.InsertOneAsync(gist);
       return Result.Ok(gist);
+    }
+    catch (Exception ex)
+    {
+      return Result.Fail(ex.Message);
+    }
+  }
+
+  public async Task<Result<bool>> DeleteAsync(string id)
+  {
+    try
+    {
+      var result = await _context.Gists.DeleteOneAsync(gist => gist.Id == id);
+      return Result.Ok(result.DeletedCount > 0);
     }
     catch (Exception ex)
     {

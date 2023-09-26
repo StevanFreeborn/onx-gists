@@ -191,6 +191,65 @@ app
   .WithName("AddGist")
   .WithDescription("Stores the given gist in the database");
 
+app
+  .MapDelete("/gists/{id}", async (
+    HttpContext context,
+    string id,
+    [FromServices] IGistRepository repository
+  ) =>
+  {
+    var userId = context.GetUserId();
+
+    if (userId == null)
+    {
+      return Results.Unauthorized();
+    }
+
+    var gistResult = await repository.GetByIdAsync(id);
+
+    if (gistResult.IsFailed)
+    {
+      var error = gistResult.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to get gist",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    if (gistResult.Value == null)
+    {
+      return Results.NotFound();
+    }
+
+    if (gistResult.Value.UserId != userId)
+    {
+      return Results.Forbid();
+    }
+
+    var deleteResult = await repository.DeleteAsync(id);
+
+    if (deleteResult.IsFailed)
+    {
+      var error = deleteResult.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to delete gist",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    if (deleteResult.Value == false)
+    {
+      return Results.NotFound();
+    }
+
+    return Results.NoContent();
+  })
+  .RequireAuthorization()
+  .WithName("DeleteGist")
+  .WithDescription("Deletes the given gist from the database");
+
 if (app.Environment.IsDevelopment())
 {
   app.UseCors("development");
