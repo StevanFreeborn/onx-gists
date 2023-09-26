@@ -1,4 +1,6 @@
 
+using System.Reflection.Metadata;
+
 namespace Server.API.Data;
 
 class GistRepository : IGistRepository
@@ -29,6 +31,26 @@ class GistRepository : IGistRepository
     {
       var gist = await _context.Gists.Find(gist => gist.Id == id).FirstOrDefaultAsync();
       return Result.Ok<Gist?>(gist);
+    }
+    catch (Exception ex)
+    {
+      return Result.Fail(ex.Message);
+    }
+  }
+
+  public async Task<Result<Gist?>> UpdateAsync(Gist gist)
+  {
+    try
+    {
+      gist.Updated = DateTimeOffset.UtcNow;
+
+      var updatedGist = await _context.Gists.FindOneAndReplaceAsync(
+        g => g.Id == gist.Id,
+        gist,
+        new() { ReturnDocument = ReturnDocument.After }
+      );
+
+      return Result.Ok<Gist?>(updatedGist);
     }
     catch (Exception ex)
     {

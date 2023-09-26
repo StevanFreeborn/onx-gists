@@ -42,6 +42,7 @@ builder.Services.Configure<DbOptions>(config.GetSection(nameof(DbOptions)));
 builder.Services.AddSingleton<DbContext>();
 builder.Services.AddScoped<IGistRepository, GistRepository>();
 builder.Services.AddScoped<IValidator<NewGistDto>, NewGistDtoValidator>();
+builder.Services.AddScoped<IValidator<GistDto>, GistDtoValidator>();
 
 var app = builder.Build();
 
@@ -64,11 +65,11 @@ app
       return Results.Unauthorized();
     }
 
-    var gist = await repository.GetByIdAsync(id);
+    var gistResult = await repository.GetByIdAsync(id);
 
-    if (gist.IsFailed)
+    if (gistResult.IsFailed)
     {
-      var error = gist.Errors.FirstOrDefault();
+      var error = gistResult.Errors.FirstOrDefault();
       return Results.Problem(
         title: "Unable to get gist",
         detail: error?.Message,
@@ -76,21 +77,70 @@ app
       );
     }
 
-    if (gist.Value == null)
+    if (gistResult.Value == null)
     {
       return Results.NotFound();
     }
 
-    if (gist.Value.UserId != userId && gist.Value.Visibility == "private")
+    if (gistResult.Value.UserId != userId && gistResult.Value.Visibility == "private")
     {
       return Results.Forbid();
     }
 
-    return Results.Ok(gist.Value);
+    return Results.Ok(gistResult.Value);
   })
   .RequireAuthorization()
   .WithName("GetGistById")
   .WithDescription("Gets the gist with the given id from the database");
+
+app
+  .MapPut("/gists", async (
+    HttpContext context,
+    GistDto updateGistDto,
+    [FromServices] IValidator<GistDto> validator,
+    [FromServices] IGistRepository repository
+  ) =>
+  {
+    var userId = context.GetUserId();
+
+    if (userId == null)
+    {
+      return Results.Unauthorized();
+    }
+
+    if (updateGistDto.UserId != userId)
+    {
+      return Results.Forbid();
+    }
+
+    var validationResult = await validator.ValidateAsync(updateGistDto);
+
+    if (validationResult.IsValid == false)
+    {
+      return Results.ValidationProblem(validationResult.ToDictionary());
+    }
+
+    var updateResult = await repository.UpdateAsync(updateGistDto.ToGist());
+
+    if (updateResult.Value == null)
+    {
+      return Results.NotFound();
+    }
+
+    if (updateResult.IsFailed)
+    {
+      var error = updateResult.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to update gist",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    return Results.Ok(new GistDto(updateResult.Value));
+  })
+  .WithName("UpdateGist")
+  .WithDescription("Updates the given gist in the database");
 
 app
   .MapPost("/gists", async (
@@ -119,9 +169,7 @@ app
       return Results.ValidationProblem(validationResult.ToDictionary());
     }
 
-    var newGist = newGistDto.ToGist();
-
-    var createResult = await repository.CreateAsync(newGist);
+    var createResult = await repository.CreateAsync(newGistDto.ToGist());
 
     if (createResult.IsFailed)
     {
@@ -136,7 +184,7 @@ app
     return Results.CreatedAtRoute(
       routeName: "GetGistById",
       routeValues: new { createResult.Value.Id },
-      value: createResult.Value
+      value: new GistDto(createResult.Value)
     );
   })
   .RequireAuthorization()

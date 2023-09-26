@@ -28,8 +28,8 @@ class Gist
   public int IndentSize { get; set; }
 
   [BsonElement("created")]
-  public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
+  public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
 
   [BsonElement("updated")]
-  public DateTimeOffset Updated { get; set; } = DateTimeOffset.Now;
+  public DateTimeOffset Updated { get; set; } = DateTimeOffset.UtcNow;
 }
