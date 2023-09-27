@@ -1,3 +1,6 @@
+
+using MongoDB.Driver.Linq;
+
 namespace Server.API.Data;
 
 class GistRepository : IGistRepository
@@ -32,6 +35,27 @@ class GistRepository : IGistRepository
     catch (Exception ex)
     {
       return Result.Fail(ex.Message);
+    }
+  }
+
+  public Task<Result<IEnumerable<Gist>>> GetAllAsync(GistsFilter filter)
+  {
+    try
+    {
+      var gistsQuery = _context.Gists.AsQueryable();
+
+      if (filter.IncludePrivate == false)
+      {
+        gistsQuery = gistsQuery.Where(gist => gist.Visibility == "public");
+      }
+
+      var gists = gistsQuery.ToEnumerable();
+
+      return Task.FromResult(Result.Ok(gists));
+    }
+    catch (Exception ex)
+    {
+      return Task.FromResult(Result.Fail<IEnumerable<Gist>>(ex.Message));
     }
   }
 

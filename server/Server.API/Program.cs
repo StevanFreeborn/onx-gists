@@ -52,20 +52,16 @@ app
   .WithDescription("Indicates if the gist service is up");
 
 app
-  .MapGet("/gists/{id}", async (
-    HttpContext context,
-    string id,
-    [FromServices] IGistRepository repository
-  ) =>
+  .MapGet("/gists/{id}", async ([AsParameters] GetGistRequest req) =>
   {
-    var userId = context.GetUserId();
+    var userId = req.Context.GetUserId();
 
     if (userId == null)
     {
       return Results.Unauthorized();
     }
 
-    var gistResult = await repository.GetByIdAsync(id);
+    var gistResult = await req.Repository.GetByIdAsync(req.Id);
 
     if (gistResult.IsFailed)
     {
@@ -94,33 +90,91 @@ app
   .WithDescription("Gets the gist with the given id from the database");
 
 app
-  .MapPut("/gists", async (
-    HttpContext context,
-    GistDto updateGistDto,
-    [FromServices] IValidator<GistDto> validator,
-    [FromServices] IGistRepository repository
-  ) =>
+  .MapGet("/gists", async ([AsParameters] GetGistsRequest req) =>
   {
-    var userId = context.GetUserId();
+    var userId = req.Context.GetUserId();
 
     if (userId == null)
     {
       return Results.Unauthorized();
     }
 
-    if (updateGistDto.UserId != userId)
+    if (req.PageNumber < 1)
+    {
+      return Results.BadRequest("Page number must be greater than 0");
+    }
+
+    if (req.PageSize < 1 || req.PageSize > 100)
+    {
+      return Results.BadRequest("Page size must be between 1 and 100");
+    }
+
+    var gistsResult = await req.Repository.GetAllAsync(req.Filter);
+
+    if (gistsResult.IsFailed)
+    {
+      var error = gistsResult.Errors.FirstOrDefault();
+      return Results.Problem(
+        title: "Unable to get gists",
+        detail: error?.Message,
+        statusCode: 500
+      );
+    }
+
+    var gists = gistsResult.Value;
+    var totalPages = (int)Math.Ceiling(gists.Count() / (double)req.PageSize);
+    var page = req.PageNumber;
+
+    if (page > totalPages)
+    {
+      page = totalPages;
+    }
+
+    var hasNextPage = page < totalPages;
+    var pagedGists = gists
+      .Skip((page - 1) * req.PageSize)
+      .Take(req.PageSize)
+      .Select(gist => new GistDto(gist))
+      .ToList();
+
+    var pagedResult = new PagedGistsDto(
+      page,
+      pagedGists.Count(),
+      gists.Count(),
+      totalPages,
+      hasNextPage,
+      pagedGists
+    );
+
+    return Results.Ok(pagedResult);
+  })
+  .RequireAuthorization()
+  .WithName("GetGists")
+  .WithDescription("Gets all gists from the database");
+
+app
+  .MapPut("/gists", async ([AsParameters] UpdateGistRequest req) =>
+  {
+    var userId = req.Context.GetUserId();
+
+    if (userId == null)
+    {
+      return Results.Unauthorized();
+    }
+
+    if (req.Dto.UserId != userId)
     {
       return Results.Forbid();
     }
 
-    var validationResult = await validator.ValidateAsync(updateGistDto);
+    var validationResult = await req.Validator.ValidateAsync(req.Dto);
 
     if (validationResult.IsValid == false)
     {
       return Results.ValidationProblem(validationResult.ToDictionary());
     }
 
-    var updateResult = await repository.UpdateAsync(updateGistDto.ToGist());
+    var updateResult = await req.Repository.UpdateAsync(req.Dto.ToGist());
 
     if (updateResult.Value == null)
     {
@@ -143,33 +197,28 @@ app
   .WithDescription("Updates the given gist in the database");
 
 app
-  .MapPost("/gists", async (
-    HttpContext context,
-    NewGistDto newGistDto,
-    [FromServices] IValidator<NewGistDto> validator,
-    [FromServices] IGistRepository repository
-  ) =>
+  .MapPost("/gists", async ([AsParameters] CreateGistRequest req) =>
   {
-    var userId = context.GetUserId();
+    var userId = req.Context.GetUserId();
 
     if (userId == null)
     {
       return Results.Unauthorized();
     }
 
-    if (newGistDto.UserId != userId)
+    if (req.Dto.UserId != userId)
     {
       return Results.Forbid();
     }
 
-    var validationResult = await validator.ValidateAsync(newGistDto);
+    var validationResult = await req.Validator.ValidateAsync(req.Dto);
 
     if (validationResult.IsValid == false)
     {
       return Results.ValidationProblem(validationResult.ToDictionary());
     }
 
-    var createResult = await repository.CreateAsync(newGistDto.ToGist());
+    var createResult = await req.Repository.CreateAsync(req.Dto.ToGist());
 
     if (createResult.IsFailed)
     {
@@ -192,20 +241,16 @@ app
   .WithDescription("Stores the given gist in the database");
 
 app
-  .MapDelete("/gists/{id}", async (
-    HttpContext context,
-    string id,
-    [FromServices] IGistRepository repository
-  ) =>
+  .MapDelete("/gists/{id}", async ([AsParameters] DeleteGistRequest req) =>
   {
-    var userId = context.GetUserId();
+    var userId = req.Context.GetUserId();
 
     if (userId == null)
     {
       return Results.Unauthorized();
     }
 
-    var gistResult = await repository.GetByIdAsync(id);
+    var gistResult = await req.Repository.GetByIdAsync(req.Id);
 
     if (gistResult.IsFailed)
     {
@@ -227,7 +272,7 @@ app
       return Results.Forbid();
     }
 
-    var deleteResult = await repository.DeleteAsync(id);
+    var deleteResult = await req.Repository.DeleteAsync(req.Id);
 
     if (deleteResult.IsFailed)
     {

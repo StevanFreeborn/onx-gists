@@ -1,15 +1,15 @@
 namespace Server.API.Dtos;
 
-class NewGistDto
+record NewGistDto(
+  string UserId,
+  string Name,
+  string Description,
+  List<string> Formula,
+  string Visibility,
+  string LineWrapMode,
+  int IndentSize
+)
 {
-  public string UserId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string Description { get; set; } = string.Empty;
-  public List<string> Formula { get; set; } = new();
-  public string Visibility { get; set; } = string.Empty;
-  public string LineWrapMode { get; set; } = string.Empty;
-  public int IndentSize { get; set; }
-
   internal Gist ToGist()
   {
     return new Gist

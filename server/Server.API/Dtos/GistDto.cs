@@ -1,23 +1,30 @@
 namespace Server.API.Dtos;
 
-class GistDto
+record GistDto(
+  string Id,
+  string UserId,
+  string Name,
+  string Description,
+  List<string> Formula,
+  string Visibility,
+  string LineWrapMode,
+  int IndentSize,
+  DateTimeOffset Created,
+  DateTimeOffset Updated
+)
 {
-  public string Id { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string Description { get; set; } = string.Empty;
-  public List<string> Formula { get; set; } = new();
-  public string Visibility { get; set; } = string.Empty;
-  public string LineWrapMode { get; set; } = string.Empty;
-  public int IndentSize { get; set; }
-  public DateTimeOffset Created { get; set; }
-  public DateTimeOffset Updated { get; set; }
-
-  public GistDto()
-  {
-  }
-
-  public GistDto(Gist gist)
+  internal GistDto(Gist gist) : this(
+    gist.Id,
+    gist.UserId,
+    gist.Name,
+    gist.Description,
+    gist.Formula,
+    gist.Visibility,
+    gist.LineWrapMode,
+    gist.IndentSize,
+    gist.Created,
+    gist.Updated
+  )
   {
     Id = gist.Id;
     UserId = gist.UserId;
