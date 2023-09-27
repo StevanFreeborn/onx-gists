@@ -6,5 +6,5 @@ interface IGistRepository
   Task<Result<Gist?>> UpdateAsync(Gist gist);
   Task<Result<Gist?>> GetByIdAsync(string id);
   Task<Result<bool>> DeleteAsync(string id);
-  Task<Result<IEnumerable<Gist>>> GetAllAsync(GistsFilter filter);
+  Task<Result<List<Gist>>> GetAllAsync(GistsFilter filter);
 }

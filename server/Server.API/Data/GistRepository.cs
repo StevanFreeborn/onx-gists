@@ -38,7 +38,7 @@ class GistRepository : IGistRepository
     }
   }
 
-  public Task<Result<IEnumerable<Gist>>> GetAllAsync(GistsFilter filter)
+  public async Task<Result<List<Gist>>> GetAllAsync(GistsFilter filter)
   {
     try
     {
@@ -49,13 +49,11 @@ class GistRepository : IGistRepository
         gistsQuery = gistsQuery.Where(gist => gist.Visibility == "public");
       }
 
-      var gists = gistsQuery.ToEnumerable();
-
-      return Task.FromResult(Result.Ok(gists));
+      return Result.Ok(await gistsQuery.ToListAsync());
     }
     catch (Exception ex)
     {
-      return Task.FromResult(Result.Fail<IEnumerable<Gist>>(ex.Message));
+      return Result.Fail(ex.Message);
     }
   }
 
