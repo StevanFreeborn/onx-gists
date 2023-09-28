@@ -1,4 +1,4 @@
-namespace Server.API.Interfaces;
+namespace Server.API.Data;
 
 interface IGistRepository
 {
