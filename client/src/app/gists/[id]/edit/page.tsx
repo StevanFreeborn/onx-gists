@@ -2,10 +2,10 @@ import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import DeleteButton from '@/components/DeleteButton';
 import GistForm from '@/components/GistForm';
+import { prismaClient } from '@/data/client';
 import { client } from '@/http/client';
 import { gistService } from '@/services/gistService';
 import { Visibility, createGist } from '@/types/gist';
-import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 
@@ -23,7 +23,7 @@ export default async function EditGist({ params }: { params: { id: string } }) {
   }
 
   const gistDto = gistResult.value;
-  const gistUser = await new PrismaClient().user.findUnique({
+  const gistUser = await prismaClient.user.findUnique({
     where: { id: gistDto.userId },
   });
 
