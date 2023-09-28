@@ -1,4 +1,4 @@
-import { Client } from '@/types/client';
+import { Client } from '@/types';
 
 export function client(clientConfig?: {
   authHeader?: Record<string, string> | undefined;

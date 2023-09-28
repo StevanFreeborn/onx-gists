@@ -5,7 +5,7 @@ import GistForm from '@/components/GistForm';
 import { prismaClient } from '@/data/client';
 import { client } from '@/http/client';
 import { gistService } from '@/services/gistService';
-import { Visibility, createGist } from '@/types/gist';
+import { Visibility, createGist } from '@/types';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 

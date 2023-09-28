@@ -1,4 +1,4 @@
-import { Visibility } from '@/types/gist';
+import { Visibility } from '@/types';
 import Details from './Details';
 
 export default function TypeDetails({

@@ -1,4 +1,4 @@
-import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types/gist';
+import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types';
 
 export const fakeGists: Gist[] = [
   {

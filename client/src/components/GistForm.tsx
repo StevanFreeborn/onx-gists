@@ -3,7 +3,7 @@
 import { useAuthClient } from '@/hooks/useAuthClient';
 import { useRouter } from '@/hooks/useRouter';
 import { gistService } from '@/services/gistService';
-import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types/gist';
+import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types';
 import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';

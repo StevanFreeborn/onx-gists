@@ -1,4 +1,4 @@
-import { Gist } from '@/types/gist';
+import { Gist } from '@/types';
 import { timeFromNow } from '@/utils/utils';
 import Image from 'next/image';
 import Link from 'next/link';

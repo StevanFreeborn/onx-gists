@@ -1,7 +1,7 @@
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistsPage from '@/components/GistsPage';
 import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { Visibility } from '@/types';
 import {
   getDirectionQueryParam,
   getPageQueryParam,
@@ -10,7 +10,7 @@ import {
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 export default async function UsersGists({
   params,

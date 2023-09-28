@@ -1,6 +1,4 @@
-import { Client } from '@/types/client';
-import { GistDto, NewGist } from '@/types/gist';
-import { Result } from '@/types/result';
+import { Client, GistDto, NewGist, PagedGists, Result } from '@/types';
 
 export function gistService(client: Client) {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -65,10 +63,23 @@ export function gistService(client: Client) {
     return { ok: true, value: true };
   }
 
+  async function getGists(): Promise<Result<PagedGists>> {
+    const response = await client.get({
+      url: `${baseUrl}/gists`,
+    });
+
+    if (response.ok === false) {
+      return { ok: false, error: new Error('Failed to get gists.') };
+    }
+
+    return { ok: true, value: await response.json() };
+  }
+
   return {
     addGist,
     getGist,
     updateGist,
     deleteGist,
+    getGists,
   };
 }

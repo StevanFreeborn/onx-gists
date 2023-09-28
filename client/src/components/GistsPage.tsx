@@ -1,4 +1,4 @@
-import { Gist as GistType } from '@/types/gist';
+import { Gist as GistType } from '@/types';
 import { BsCode } from 'react-icons/bs';
 import Gist from './Gist';
 import Pager from './Pager';

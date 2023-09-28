@@ -1,7 +1,7 @@
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistsPage from '@/components/GistsPage';
 import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { Visibility } from '@/types';
 import {
   getDirectionQueryParam,
   getPageQueryParam,

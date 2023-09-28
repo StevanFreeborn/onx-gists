@@ -1,5 +1,40 @@
 import { User } from '@prisma/client';
 
+export type Client = {
+  get: ({
+    url,
+    config,
+  }: {
+    url: string;
+    config?: RequestInit;
+  }) => Promise<Response>;
+  post: <T>({
+    url,
+    config,
+    body,
+  }: {
+    url: string;
+    config?: RequestInit;
+    body?: T;
+  }) => Promise<Response>;
+  put: <T>({
+    url,
+    config,
+    body,
+  }: {
+    url: string;
+    config?: RequestInit;
+    body?: T;
+  }) => Promise<Response>;
+  delete: ({
+    url,
+    config,
+  }: {
+    url: string;
+    config?: RequestInit;
+  }) => Promise<Response>;
+};
+
 export enum Visibility {
   private = 'private',
   public = 'public',
@@ -37,6 +72,19 @@ export type NewGist = Omit<
 >;
 
 export type GistDto = Omit<Gist, 'username' | 'userImage'>;
+
+export type PagedGists = {
+  pageNumber: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  gists: GistDto[];
+};
+
+export type Result<T, E = Error> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };
 
 export function createGist(gist: GistDto, user: User) {
   return {
