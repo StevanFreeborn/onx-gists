@@ -38,12 +38,12 @@ static class GistsController
 
   public static async Task<IResult> GetGistsAsync([AsParameters] GetGistsRequest req)
   {
-    var userId = req.Context.GetUserId();
+    // var userId = req.Context.GetUserId();
 
-    if (userId == null)
-    {
-      return Results.Unauthorized();
-    }
+    // if (userId == null)
+    // {
+    //   return Results.Unauthorized();
+    // }
 
     if (req.PageNumber < 1)
     {

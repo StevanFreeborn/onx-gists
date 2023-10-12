@@ -42,6 +42,46 @@ class GistRepository : IGistRepository
   {
     try
     {
+      var countFacetName = "count";
+      var dataFacetName = "data";
+
+      var countFacet = AggregateFacet.Create(countFacetName,
+        PipelineDefinition<Gist, AggregateCountResult>.Create(
+          new[]
+          {
+            PipelineStageDefinitionBuilder.Count<Gist>()
+          }
+        )
+      );
+
+      var dataFacet = AggregateFacet.Create(dataFacetName,
+        PipelineDefinition<Gist, Gist>.Create(
+          new[]
+          {
+              PipelineStageDefinitionBuilder.Skip<Gist>(10),
+              PipelineStageDefinitionBuilder.Limit<Gist>(10),
+          }
+        )
+      );
+
+      var aggregate = await _context.Gists.Aggregate()
+        .Facet(countFacet, dataFacet).FirstOrDefaultAsync();
+
+      var count = aggregate
+        .Facets
+        .First(facet => facet.Name == countFacetName)
+        .Output<AggregateCountResult>()[0];
+
+      var data = aggregate
+        .Facets
+        .First(facet => facet.Name == dataFacetName)
+        .Output<Gist>();
+
+      var page = new Page<Gist>(
+        count.Count,
+        data: data.ToList()
+      );
+
       var gistsQuery = _context.Gists.AsQueryable();
 
       if (filter.IncludePrivate == false)
