@@ -45,12 +45,12 @@ static class GistsController
     //   return Results.Unauthorized();
     // }
 
-    if (req.PageNumber < 1)
+    if (req.Filter.PageNumber < 1)
     {
       return Results.BadRequest("Page number must be greater than 0");
     }
 
-    if (req.PageSize < 1 || req.PageSize > 100)
+    if (req.Filter.PageSize < 1 || req.Filter.PageSize > 100)
     {
       return Results.BadRequest("Page size must be between 1 and 100");
     }
@@ -67,28 +67,22 @@ static class GistsController
       );
     }
 
-    var gists = gistsResult.Value;
-    var totalPages = (int)Math.Ceiling(gists.Count() / (double)req.PageSize);
-    var page = req.PageNumber;
+    var page = gistsResult.Value;
+    var totalPages = (int)Math.Ceiling(page.Count / (double)req.Filter.PageSize);
 
-    if (page > totalPages)
-    {
-      page = totalPages;
-    }
-
-    var hasNextPage = page < totalPages;
-    var pagedGists = gists
-      .Skip((page - 1) * req.PageSize)
-      .Take(req.PageSize)
+    var hasNextPage = req.Filter.PageNumber < totalPages;
+    var gistDtos = page
+      .Data
       .Select(gist => new GistDto(gist))
       .ToList();
 
     var pagedResult = new PagedGistsResponse(
-      page,
-      gists.Count,
-      totalPages,
-      hasNextPage,
-      pagedGists
+      PageNumber: req.Filter.PageNumber,
+      PageSize: gistDtos.Count,
+      TotalPages: totalPages,
+      TotalGists: page.Count,
+      HasNextPage: hasNextPage,
+      Gists: gistDtos
     );
 
     return Results.Ok(pagedResult);

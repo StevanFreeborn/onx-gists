@@ -1,3 +1,4 @@
+
 namespace Server.API.Models;
 
 record GetGistRequest(
@@ -9,23 +10,37 @@ record GetGistRequest(
 record GetGistsRequest(
   HttpContext Context,
   GistsFilter Filter,
-  [FromServices] IGistRepository Repository,
-  [FromQuery] int PageNumber = 1,
-  [FromQuery] int PageSize = 10
+  [FromServices] IGistRepository Repository
 );
 
 record GistsFilter
 {
+  public int PageNumber { get; init; } = 1;
+  public int PageSize { get; init; } = 10;
   public bool IncludePrivate { get; init; } = false;
 
   public static ValueTask<GistsFilter> BindAsync(HttpContext context, ParameterInfo parameter)
   {
     var filter = new GistsFilter
     {
+      PageNumber = int.TryParse(context.Request.Query["pageNumber"], out var pageNumber) ? pageNumber : 1,
+      PageSize = int.TryParse(context.Request.Query["pageSize"], out var pageSize) ? pageSize : 10,
       IncludePrivate = bool.TryParse(context.Request.Query["includePrivate"], out var includePrivate) && includePrivate
     };
 
     return ValueTask.FromResult(filter);
+  }
+
+  internal FilterDefinition<Gist> ToFilterDefinition()
+  {
+    var filter = Builders<Gist>.Filter.Empty;
+
+    if (IncludePrivate is false)
+    {
+      filter &= Builders<Gist>.Filter.Eq(gist => gist.Visibility, "public");
+    }
+
+    return filter;
   }
 }
 

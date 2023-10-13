@@ -38,7 +38,7 @@ class GistRepository : IGistRepository
     }
   }
 
-  public async Task<Result<List<Gist>>> GetAllAsync(GistsFilter filter)
+  public async Task<Result<Page<Gist>>> GetAllAsync(GistsFilter filter)
   {
     try
     {
@@ -58,14 +58,20 @@ class GistRepository : IGistRepository
         PipelineDefinition<Gist, Gist>.Create(
           new[]
           {
-              PipelineStageDefinitionBuilder.Skip<Gist>(10),
-              PipelineStageDefinitionBuilder.Limit<Gist>(10),
+              PipelineStageDefinitionBuilder.Skip<Gist>(
+                (filter.PageNumber - 1) * filter.PageSize
+              ),
+              PipelineStageDefinitionBuilder.Limit<Gist>(
+                filter.PageSize
+              ),
           }
         )
       );
 
       var aggregate = await _context.Gists.Aggregate()
-        .Facet(countFacet, dataFacet).FirstOrDefaultAsync();
+        .Match(filter.ToFilterDefinition())
+        .Facet(countFacet, dataFacet)
+        .FirstOrDefaultAsync();
 
       var count = aggregate
         .Facets
@@ -82,14 +88,7 @@ class GistRepository : IGistRepository
         data: data.ToList()
       );
 
-      var gistsQuery = _context.Gists.AsQueryable();
-
-      if (filter.IncludePrivate == false)
-      {
-        gistsQuery = gistsQuery.Where(gist => gist.Visibility == "public");
-      }
-
-      return Result.Ok(await gistsQuery.ToListAsync());
+      return Result.Ok(page);
     }
     catch (Exception ex)
     {
