@@ -1,3 +1,5 @@
+'use client';
+
 import { Gist as GistType } from '@/types';
 import { BsCode } from 'react-icons/bs';
 import Gist from './Gist';
@@ -7,6 +9,14 @@ import TypeDetails from './TypeDetails';
 
 type Param = string | undefined | null;
 
+type PageInfo = {
+  pageNumber: number;
+  pageSize: number;
+  totalGists: number;
+  totalPages: number;
+  hasNextPage: boolean;
+};
+
 export default function GistsPage({
   heading,
   isCurrentUsersPage = false,
@@ -14,6 +24,7 @@ export default function GistsPage({
   sort,
   direction,
   gists,
+  pageInfo,
 }: {
   heading: string;
   isCurrentUsersPage?: boolean;
@@ -21,6 +32,7 @@ export default function GistsPage({
   sort: Param;
   direction: Param;
   gists: GistType[];
+  pageInfo: PageInfo;
 }) {
   // TODO: If there are no gists display some sort of place holder
 
@@ -35,18 +47,26 @@ export default function GistsPage({
           {isCurrentUsersPage ? (
             <TypeDetails userId={currentUserId} type="all" />
           ) : null}
-          <SortDetails sortBy={sort} direction={direction} />
+          <SortDetails
+            sortBy={sort}
+            direction={direction}
+            page={pageInfo.pageNumber}
+          />
         </div>
       </div>
       <div className="flex flex-col flex-1 w-full items-center gap-8 py-6 px-4">
         {gists.map(gist => {
           return <Gist key={gist.id} gist={gist} />;
         })}
-        {/* TODO: If there is not multiple pages don't display */}
-        {/* TODO: Figure out what params to pass to pager */}
-        <div className="flex flex-col w-full gap-4 max-w-4xl">
-          <Pager />
-        </div>
+        {pageInfo.totalPages > 1 ? (
+          <div className="flex flex-col w-full gap-4 max-w-4xl">
+            <Pager
+              currentPage={pageInfo.pageNumber}
+              hasNextPage={pageInfo.hasNextPage}
+              direction={direction}
+            />
+          </div>
+        ) : null}
       </div>
     </main>
   );

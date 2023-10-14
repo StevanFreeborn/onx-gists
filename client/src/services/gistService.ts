@@ -63,9 +63,34 @@ export function gistService(client: Client) {
     return { ok: true, value: true };
   }
 
-  async function getGists(): Promise<Result<PagedGists>> {
+  type GetGistsRequest = {
+    [key: string]: string | number | boolean | undefined;
+    userId?: string;
+    pageNumber?: number;
+    pageSize?: number;
+    includePrivate?: boolean;
+  };
+
+  async function getGists(
+    req: GetGistsRequest = {
+      userId: '',
+      pageNumber: 1,
+      pageSize: 10,
+      includePrivate: false,
+    }
+  ): Promise<Result<PagedGists>> {
+    const reqUrl = new URL(`${baseUrl}/gists`);
+
+    Object.keys(req).forEach(key => {
+      const value = req[key];
+
+      if (value) {
+        reqUrl.searchParams.append(key, value.toString());
+      }
+    });
+
     const response = await client.get({
-      url: `${baseUrl}/gists`,
+      url: reqUrl.toString(),
     });
 
     if (response.ok === false) {

@@ -76,7 +76,7 @@ export type GistDto = Omit<Gist, 'username' | 'userImage'>;
 export type PagedGists = {
   pageNumber: number;
   pageSize: number;
-  totalItems: number;
+  totalGists: number;
   totalPages: number;
   hasNextPage: boolean;
   gists: GistDto[];

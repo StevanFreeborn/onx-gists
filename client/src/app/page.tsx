@@ -27,13 +27,13 @@ export default async function Home({
   const sort = getSortQueryParam(searchParams);
   const direction = getDirectionQueryParam(searchParams);
 
-  const gistsResult = await getGists();
+  const gistsResult = await getGists({ pageNumber: page });
 
   if (gistsResult.ok === false) {
     throw new Error('Error getting gists');
   }
 
-  const gistDtos = gistsResult.value.gists;
+  const { gists: gistDtos, ...pageInfo } = gistsResult.value;
   const gistUsers = gistDtos.map(gist => gist.userId);
   const users = await prismaClient.user.findMany({
     where: { id: { in: gistUsers } },
@@ -59,6 +59,7 @@ export default async function Home({
       sort={sort}
       direction={direction}
       gists={sortedGists}
+      pageInfo={pageInfo}
     />
   );
 }

@@ -15,20 +15,36 @@ record GetGistsRequest(
 
 record GistsFilter
 {
+  public string UserId { get; init; } = string.Empty;
   public int PageNumber { get; init; } = 1;
   public int PageSize { get; init; } = 10;
   public bool IncludePrivate { get; init; } = false;
 
-  public static ValueTask<GistsFilter> BindAsync(HttpContext context, ParameterInfo parameter)
+  public static async ValueTask<GistsFilter> BindAsync(HttpContext context, ParameterInfo parameter)
   {
+    var query = context.Request.Query;
+    var userId = query.TryGetValue("userId", out var id) ? id.ToString() : string.Empty;
+    var pageNumber = query.TryGetValue("pageNumber", out var pn) && int.TryParse(pn.ToString(), out var parsedPN)
+      ? parsedPN
+      : 1;
+
+    var pageSize = query.TryGetValue("pageSize", out var ps) && int.TryParse(ps.ToString(), out var parsedPS)
+      ? parsedPS
+      : 10;
+
+    var includePrivate = query.TryGetValue("includePrivate", out var ip) &&
+      bool.TryParse(ip.ToString(), out var parsedIP) &&
+      parsedIP;
+
     var filter = new GistsFilter
     {
-      PageNumber = int.TryParse(context.Request.Query["pageNumber"], out var pageNumber) ? pageNumber : 1,
-      PageSize = int.TryParse(context.Request.Query["pageSize"], out var pageSize) ? pageSize : 10,
-      IncludePrivate = bool.TryParse(context.Request.Query["includePrivate"], out var includePrivate) && includePrivate
+      UserId = userId,
+      PageNumber = pageNumber,
+      PageSize = pageSize,
+      IncludePrivate = includePrivate
     };
 
-    return ValueTask.FromResult(filter);
+    return await ValueTask.FromResult(filter);
   }
 
   internal FilterDefinition<Gist> ToFilterDefinition()
@@ -38,6 +54,11 @@ record GistsFilter
     if (IncludePrivate is false)
     {
       filter &= Builders<Gist>.Filter.Eq(gist => gist.Visibility, "public");
+    }
+
+    if (UserId != string.Empty)
+    {
+      filter &= Builders<Gist>.Filter.Eq(gist => gist.UserId, UserId);
     }
 
     return filter;
