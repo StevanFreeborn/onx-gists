@@ -50,13 +50,11 @@ app
 
 app
   .MapGet("/gists/{id}", GistsController.GetGistAsync)
-  .RequireAuthorization()
   .WithName("GetGistById")
   .WithDescription("Gets the gist with the given id from the database");
 
 app
   .MapGet("/gists", GistsController.GetGistsAsync)
-  .RequireAuthorization()
   .WithName("GetGists")
   .WithDescription("Gets all gists from the database");
 

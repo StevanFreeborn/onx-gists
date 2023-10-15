@@ -12,8 +12,6 @@ export default function Pager({
   direction: string | null | undefined;
 }) {
   const router = useRouter();
-
-  // TODO: This I think can be simplified
   const isAscending = direction === 'asc';
 
   function handleOlderButtonClick() {

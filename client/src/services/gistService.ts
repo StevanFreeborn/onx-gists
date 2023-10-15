@@ -69,6 +69,7 @@ export function gistService(client: Client) {
     pageNumber?: number;
     pageSize?: number;
     includePrivate?: boolean;
+    includePublic?: boolean;
   };
 
   async function getGists(
@@ -77,6 +78,7 @@ export function gistService(client: Client) {
       pageNumber: 1,
       pageSize: 10,
       includePrivate: false,
+      includePublic: true,
     }
   ): Promise<Result<PagedGists>> {
     const reqUrl = new URL(`${baseUrl}/gists`);
@@ -94,6 +96,7 @@ export function gistService(client: Client) {
     });
 
     if (response.ok === false) {
+      console.log(response.status, response.statusText);
       return { ok: false, error: new Error('Failed to get gists.') };
     }
 

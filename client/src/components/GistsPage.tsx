@@ -25,6 +25,7 @@ export default function GistsPage({
   direction,
   gists,
   pageInfo,
+  type,
 }: {
   heading: string;
   isCurrentUsersPage?: boolean;
@@ -33,6 +34,7 @@ export default function GistsPage({
   direction: Param;
   gists: GistType[];
   pageInfo: PageInfo;
+  type?: string;
 }) {
   // TODO: If there are no gists display some sort of place holder
 
@@ -45,7 +47,7 @@ export default function GistsPage({
         </div>
         <div className="flex gap-2 relative">
           {isCurrentUsersPage ? (
-            <TypeDetails userId={currentUserId} type="all" />
+            <TypeDetails userId={currentUserId} type={type ?? 'all'} />
           ) : null}
           <SortDetails
             sortBy={sort}

@@ -1,7 +1,10 @@
+import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistsPage from '@/components/GistsPage';
-import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types';
+import { prismaClient } from '@/data/client';
+import { client } from '@/http/client';
+import { gistService } from '@/services/gistService';
+import { Visibility, createGist } from '@/types';
 import {
   getDirectionQueryParam,
   getPageQueryParam,
@@ -20,35 +23,50 @@ export default async function UsersPublicGists({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const session = await getServerSession(nextAuthOptions);
+  const { getGists } = gistService(
+    client({ authHeader: { Authorization: `Bearer ${session?.apiJwt}` } })
+  );
   const page = getPageQueryParam(searchParams);
   const sort = getSortQueryParam(searchParams);
   const direction = getDirectionQueryParam(searchParams);
   const isCurrentUsersPage = params.userId === session?.userId;
 
-  // TODO: Get user from database
-  const user = fakeGists.find(gist => gist.userId === params.userId);
+  const user = await prismaClient.user.findUnique({
+    where: { id: params.userId },
+  });
 
-  // TODO: Actually get gists from gist service
-  const filteredGists = isCurrentUsersPage
-    ? fakeGists.filter(
-        gist =>
-          gist.userId === params.userId && gist.visibility === Visibility.public
-      )
-    : fakeGists.filter(
-        gist =>
-          gist.userId === params.userId && gist.visibility === Visibility.public
-      );
+  if (user === null) {
+    return <NotFound />;
+  }
 
-  const sortedGists = sortGists(filteredGists, sort, direction);
+  const gistsResult = await getGists({
+    userId: params.userId,
+    pageNumber: page,
+    includePublic: true,
+  });
+
+  if (gistsResult.ok === false) {
+    throw new Error('Error getting gists');
+  }
+
+  const { gists: gistDtos, ...pageInfo } = gistsResult.value;
+
+  const gists = gistDtos.map(gist => createGist(gist, user));
+
+  const sortedGists = sortGists(gists, sort, direction);
 
   return (
     <GistsPage
-      heading={isCurrentUsersPage ? 'Your gists' : `${user?.username}'s gists`}
+      heading={
+        isCurrentUsersPage ? 'Your public gists' : `${user?.id}'s public gists`
+      }
       isCurrentUsersPage={isCurrentUsersPage}
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
       gists={sortedGists}
+      pageInfo={pageInfo}
+      type={Visibility.public}
     />
   );
 }

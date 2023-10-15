@@ -42,6 +42,8 @@ export default async function UsersGists({
   const gistsResult = await getGists({
     userId: params.userId,
     pageNumber: page,
+    includePrivate: isCurrentUsersPage,
+    includePublic: true,
   });
 
   if (gistsResult.ok === false) {

@@ -4,13 +4,6 @@ static class GistsController
 {
   public static async Task<IResult> GetGistAsync([AsParameters] GetGistRequest req)
   {
-    var userId = req.Context.GetUserId();
-
-    if (userId == null)
-    {
-      return Results.Unauthorized();
-    }
-
     var gistResult = await req.Repository.GetByIdAsync(req.Id);
 
     if (gistResult.IsFailed)
@@ -28,6 +21,8 @@ static class GistsController
       return Results.NotFound();
     }
 
+    var userId = req.Context.GetUserId();
+
     if (gistResult.Value.UserId != userId && gistResult.Value.Visibility == "private")
     {
       return Results.Forbid();
@@ -40,7 +35,7 @@ static class GistsController
   {
     var userId = req.Context.GetUserId();
 
-    if (userId == null)
+    if (req.Filter.IncludePrivate && userId != req.Filter.UserId)
     {
       return Results.Unauthorized();
     }
