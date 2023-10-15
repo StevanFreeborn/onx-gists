@@ -1,12 +1,16 @@
+'use client';
+
 import { SortOrders } from '@/enums/sortOrders';
 import Details from './Details';
 
 export default function SortDetails({
   sortBy,
   direction,
+  page,
 }: {
   sortBy?: string | null;
   direction?: string | null;
+  page?: number;
 }) {
   const currentLinkKey =
     sortBy === undefined ||
@@ -16,7 +20,11 @@ export default function SortDetails({
       ? SortOrders.createdDescending
       : `${sortBy}-${direction}`;
 
-  const links = {
+  type Links = {
+    [key: string]: { linkText: string; href: string };
+  };
+
+  let links: Links = {
     [SortOrders.createdDescending]: {
       linkText: 'Recently Created',
       href: '?direction=desc&sort=created',
@@ -34,6 +42,14 @@ export default function SortDetails({
       href: '?direction=asc&sort=updated',
     },
   };
+
+  if (page) {
+    links = Object.fromEntries(
+      Object.entries(links).map(([key, value]) => {
+        return [key, { ...value, href: `${value.href}&page=${page}` }];
+      })
+    );
+  }
 
   return <Details label="Sort" currentLinkKey={currentLinkKey} links={links} />;
 }

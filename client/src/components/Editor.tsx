@@ -153,6 +153,8 @@ export default function Editor({
       { dark: true }
     );
 
+    // TODO: Add tab size setting
+    // TODO: Add line wrapping setting
     const tabSize = new Compartment();
     const lineWrapping = new Compartment();
 

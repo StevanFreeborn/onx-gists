@@ -1,5 +1,5 @@
+import { prismaClient } from '@/data/client';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AuthOptions, DefaultSession, DefaultUser } from 'next-auth';
 import { DefaultJWT, JWT } from 'next-auth/jwt';
@@ -31,7 +31,7 @@ declare module 'next-auth/jwt' {
   }
 }
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export const nextAuthOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),

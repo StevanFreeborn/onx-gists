@@ -2,8 +2,10 @@
   "dotnet.defaultSolution": "server/Server.sln",
   "css.lint.unknownAtRules": "ignore",
   "cSpell.words": [
+    "Bson",
     "childrens",
     "codemirror",
+    "Dtos",
     "formik",
     "keymap",
     "lezer",

@@ -1,4 +1,4 @@
-import { Gist } from '@/types/gist';
+import { Gist } from '@/types';
 import { timeFromNow } from '@/utils/utils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ export default function Gist({ gist }: { gist: Gist }) {
         <div className="flex gap-3 items-start">
           <div>
             <Image
-              src={'https://placehold.co/400'}
+              src={gist.userImage}
               alt="User Image"
               width={30}
               height={30}

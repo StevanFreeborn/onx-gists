@@ -11,7 +11,9 @@ builder.Services
     {
       ValidIssuer = jwtOptions.Issuer,
       ValidAudience = jwtOptions.Audience,
-      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+      IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(jwtOptions.Secret)
+      ),
       ValidateIssuer = true,
       ValidateAudience = true,
       ValidateLifetime = true,
@@ -33,30 +35,49 @@ builder.Services.AddCors(
   )
 );
 
-builder.Services.AddCors(
-  options => options.AddPolicy(
-    "production",
-    policy => policy
-      .AllowCredentials()
-      .AllowAnyHeader()
-      .AllowAnyMethod()
-      .WithOrigins(
-        new[] { "https://onxgists.stevanfreeborn.com", "https://onx-gists-client.vercel.app" }
-      )
-  )
-);
+builder.Services.Configure<DbOptions>(config.GetSection(nameof(DbOptions)));
+builder.Services.AddSingleton<DbContext>();
+builder.Services.AddScoped<IGistRepository, GistRepository>();
+builder.Services.AddScoped<IValidator<NewGistDto>, NewGistDtoValidator>();
+builder.Services.AddScoped<IValidator<GistDto>, GistDtoValidator>();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!").RequireAuthorization();
+app
+  .MapGet("/ping", () => new { Message = "I'm alive!" })
+  .WithName("Ping")
+  .WithDescription("Indicates if the gist service is up");
+
+app
+  .MapGet("/gists/{id}", GistsController.GetGistAsync)
+  .WithName("GetGistById")
+  .WithDescription("Gets the gist with the given id from the database");
+
+app
+  .MapGet("/gists", GistsController.GetGistsAsync)
+  .WithName("GetGists")
+  .WithDescription("Gets all gists from the database");
+
+app.MapPost("/gists", GistsController.CreateGistAsync)
+  .RequireAuthorization()
+  .WithName("AddGist")
+  .WithDescription("Stores the given gist in the database");
+
+app
+  .MapPut("/gists", GistsController.UpdateGistAsync)
+  .RequireAuthorization()
+  .WithName("UpdateGist")
+  .WithDescription("Updates the given gist in the database");
+
+app
+  .MapDelete("/gists/{id}", GistsController.DeleteGistAsync)
+  .RequireAuthorization()
+  .WithName("DeleteGist")
+  .WithDescription("Deletes the given gist from the database");
 
 if (app.Environment.IsDevelopment())
 {
   app.UseCors("development");
-}
-else
-{
-  app.UseCors("production");
 }
 
 app.UseAuthentication();

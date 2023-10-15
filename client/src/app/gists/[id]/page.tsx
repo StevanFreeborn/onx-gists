@@ -1,26 +1,48 @@
 import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
+import DeleteButton from '@/components/DeleteButton';
 import GistForm from '@/components/GistForm';
-import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { prismaClient } from '@/data/client';
+import { client } from '@/http/client';
+import { gistService } from '@/services/gistService';
+import { Visibility, createGist } from '@/types';
 import { timeFromNow } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BsFillPencilFill, BsFillTrashFill } from 'react-icons/bs';
+import { BsFillPencilFill } from 'react-icons/bs';
 
+export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 export default async function ViewGist({ params }: { params: { id: string } }) {
   const session = await getServerSession(nextAuthOptions);
-  const gist = fakeGists.find(gist => gist.id === params.id);
-  const isCurrentUsersGist = gist?.userId === session?.userId;
+  const { getGist } = gistService(
+    client({ authHeader: { Authorization: `Bearer ${session?.apiJwt}` } })
+  );
+  const gistResult = await getGist(params.id);
 
-  if (gist === undefined) {
+  if (gistResult.ok === false) {
     return <NotFound />;
   }
 
-  if (isCurrentUsersGist === false && gist.visibility === Visibility.private) {
+  const gistDto = gistResult.value;
+  const gistUser = await prismaClient.user.findUnique({
+    where: { id: gistDto.userId },
+  });
+
+  if (gistUser === null) {
+    return <NotFound />;
+  }
+
+  const gist = createGist(gistDto, gistUser);
+
+  const isCurrentUsersGist = gist.userId === session?.userId;
+
+  if (
+    isCurrentUsersGist === false &&
+    gistResult.value.visibility === Visibility.private
+  ) {
     return <NotFound />;
   }
 
@@ -30,7 +52,7 @@ export default async function ViewGist({ params }: { params: { id: string } }) {
         <div className="flex items-start gap-2">
           <div>
             <Image
-              src={'https://placehold.co/400'}
+              src={gist.userImage}
               alt="User Image"
               width={32}
               height={32}
@@ -75,13 +97,7 @@ export default async function ViewGist({ params }: { params: { id: string } }) {
               <BsFillPencilFill className="w-3 h-3" />
               Edit
             </Link>
-            <button
-              type="button"
-              className="flex items-center justify-center gap-1 px-2 py-1 rounded-md text-sm bg-secondary-gray border border-gray-600 hover:bg-red-600 group/delete"
-            >
-              <BsFillTrashFill className="w-3 h-3 text-red-600 group-hover/delete:text-primary-white" />
-              Delete
-            </button>
+            <DeleteButton id={gist.id} />
           </div>
         ) : null}
       </div>

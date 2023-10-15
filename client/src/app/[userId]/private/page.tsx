@@ -1,11 +1,15 @@
+import NotFound from '@/app/not-found';
 import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import GistsPage from '@/components/GistsPage';
-import { fakeGists } from '@/constants/constants';
-import { Visibility } from '@/types/gist';
+import { prismaClient } from '@/data/client';
+import { client } from '@/http/client';
+import { gistService } from '@/services/gistService';
+import { Visibility, createGist } from '@/types';
 import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
+  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
@@ -19,34 +23,49 @@ export default async function UsersPrivateGists({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const session = await getServerSession(nextAuthOptions);
+  const { getGists } = gistService(
+    client({ authHeader: { Authorization: `Bearer ${session?.apiJwt}` } })
+  );
   const page = getPageQueryParam(searchParams);
   const sort = getSortQueryParam(searchParams);
   const direction = getDirectionQueryParam(searchParams);
   const isCurrentUsersPage = params.userId === session?.userId;
 
-  // TODO: Get user from database
-  const user = fakeGists.find(gist => gist.userId === params.userId);
+  const user = await prismaClient.user.findUnique({
+    where: { id: params.userId },
+  });
 
-  // TODO: Actually get gists from gist service
-  const filteredGists = isCurrentUsersPage
-    ? fakeGists.filter(
-        gist =>
-          gist.userId === params.userId &&
-          gist.visibility === Visibility.private
-      )
-    : fakeGists.filter(
-        gist =>
-          gist.userId === params.userId && gist.visibility === Visibility.public
-      );
+  if (user === null || user.id !== session?.userId) {
+    return <NotFound />;
+  }
+
+  const gistsResult = await getGists({
+    userId: params.userId,
+    pageNumber: page,
+    includePrivate: true,
+    includePublic: false,
+  });
+
+  if (gistsResult.ok === false) {
+    throw new Error('Error getting gists');
+  }
+
+  const { gists: gistDtos, ...pageInfo } = gistsResult.value;
+
+  const gists = gistDtos.map(gist => createGist(gist, user));
+
+  const sortedGists = sortGists(gists, sort, direction);
 
   return (
     <GistsPage
-      heading={isCurrentUsersPage ? 'Your gists' : `${user?.username} gists`}
+      heading="Your private gists"
       isCurrentUsersPage={isCurrentUsersPage}
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
-      gists={filteredGists}
+      gists={sortedGists}
+      pageInfo={pageInfo}
+      type={Visibility.private}
     />
   );
 }

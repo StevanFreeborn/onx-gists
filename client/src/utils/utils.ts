@@ -1,5 +1,5 @@
 import { SortOrders } from '@/enums/sortOrders';
-import { Gist } from '@/types/gist';
+import { Gist } from '@/types';
 
 export function getKeysFromObject<T>(formFields: T) {
   return Object.keys(formFields as object).reduce(

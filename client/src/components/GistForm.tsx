@@ -1,16 +1,18 @@
 'use client';
 
-import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types/gist';
+import { useAuthClient } from '@/hooks/useAuthClient';
+import { useRouter } from '@/hooks/useRouter';
+import { gistService } from '@/services/gistService';
+import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types';
 import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { BsCode } from 'react-icons/bs';
 import { CgSpinner } from 'react-icons/cg';
+import { toast } from 'react-toastify';
 import { array, object, string } from 'yup';
 import Editor from './Editor';
-
-// const Editor = dynamic(() => import('./Editor'));
 
 export default function GistForm({
   gist,
@@ -19,6 +21,9 @@ export default function GistForm({
   gist?: Gist;
   readOnly?: boolean;
 }) {
+  const { user, client } = useAuthClient();
+  const { addGist, updateGist } = gistService(client);
+  const router = useRouter();
   const formFields = gist ?? {
     name: '',
     description: '',
@@ -73,16 +78,30 @@ export default function GistForm({
       validateOnBlur={false}
       validateOnChange={false}
       onSubmit={async (values, { setSubmitting, resetForm }) => {
-        try {
-          // TODO: Post data to server
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          console.log({ ...values });
-          // TODO: Redirect to newly created gist page
-        } catch (error) {
-          // TODO: Display server side errors
-        } finally {
-          setSubmitting(false);
+        let result;
+
+        if (gist === undefined) {
+          const newGist = { ...values, userId: user.userId! };
+          result = await addGist(newGist);
+
+          if (result.ok === false) {
+            toast.error(result.error.message);
+            setSubmitting(false);
+            return;
+          }
+        } else {
+          const updatedGist = { ...gist, ...values };
+          result = await updateGist(updatedGist);
+
+          if (result.ok === false) {
+            toast.error(result.error.message);
+            setSubmitting(false);
+            return;
+          }
         }
+
+        router.push(`/gists/${result.value.id}`);
+        router.refresh();
       }}
     >
       {({
