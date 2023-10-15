@@ -73,10 +73,17 @@ class GistRepository : IGistRepository
         .Facet(countFacet, dataFacet)
         .FirstOrDefaultAsync();
 
-      var count = aggregate
+      var countOutput = aggregate
         .Facets
         .First(facet => facet.Name == countFacetName)
-        .Output<AggregateCountResult>()[0];
+        .Output<AggregateCountResult>();
+
+      if (countOutput.Count == 0)
+      {
+        return Result.Ok(new Page<Gist>(0, data: new List<Gist>()));
+      }
+
+      var count = countOutput[0].Count;
 
       var data = aggregate
         .Facets
@@ -84,7 +91,7 @@ class GistRepository : IGistRepository
         .Output<Gist>();
 
       var page = new Page<Gist>(
-        count.Count,
+        count: count,
         data: data.ToList()
       );
 

@@ -36,7 +36,23 @@ export default function GistsPage({
   pageInfo: PageInfo;
   type?: string;
 }) {
-  // TODO: If there are no gists display some sort of place holder
+  function renderGists() {
+    return gists.map(gist => {
+      return <Gist key={gist.id} gist={gist} />;
+    });
+  }
+
+  function renderPager() {
+    return (
+      <div className="flex flex-col w-full gap-4 max-w-4xl">
+        <Pager
+          currentPage={pageInfo.pageNumber}
+          hasNextPage={pageInfo.hasNextPage}
+          direction={direction}
+        />
+      </div>
+    );
+  }
 
   return (
     <main className="flex flex-col h-full flex-1 py-4 text-primary-white">
@@ -57,18 +73,14 @@ export default function GistsPage({
         </div>
       </div>
       <div className="flex flex-col flex-1 w-full items-center gap-8 py-6 px-4">
-        {gists.map(gist => {
-          return <Gist key={gist.id} gist={gist} />;
-        })}
-        {pageInfo.totalPages > 1 ? (
-          <div className="flex flex-col w-full gap-4 max-w-4xl">
-            <Pager
-              currentPage={pageInfo.pageNumber}
-              hasNextPage={pageInfo.hasNextPage}
-              direction={direction}
-            />
-          </div>
-        ) : null}
+        {gists.length > 0 ? (
+          renderGists()
+        ) : (
+          <h2 className="text-lg font-bold">
+            Hmmm doesn't look like we have any of those.
+          </h2>
+        )}
+        {pageInfo.totalPages > 1 ? renderPager() : null}
       </div>
     </main>
   );

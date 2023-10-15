@@ -3,7 +3,7 @@ import NProgress from 'nprogress';
 
 export function useRouter() {
   const router = useNextRouter();
-  const { push, refresh } = router;
+  const { push, refresh, back } = router;
 
   router.push = (href, options) => {
     NProgress.start();
@@ -12,6 +12,10 @@ export function useRouter() {
 
   router.refresh = () => {
     refresh();
+  };
+
+  router.back = () => {
+    back();
   };
 
   return router;

@@ -25,7 +25,8 @@ export default function DeleteButton({ id }: { id: string }) {
       return;
     }
 
-    router.push('/');
+    router.back();
+    router.refresh();
   }
 
   return (
