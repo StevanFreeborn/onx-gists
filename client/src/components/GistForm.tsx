@@ -177,13 +177,26 @@ export default function GistForm({
                         name={formFieldKeys.indentSize}
                         id={formFieldKeys.indentSize}
                         className="rounded-md px-2 py-1 text-sm bg-primary-gray text-primary-white border-r-8 border-transparent"
-                        onChange={handleChange}
+                        onChange={e => {
+                          handleChange(e);
+                          document.dispatchEvent(
+                            new CustomEvent('tab-size-change', {
+                              detail: e.target.value,
+                            })
+                          );
+                        }}
                         onBlur={handleBlur}
                       >
                         <optgroup label="Indent Size">
-                          <option value="2">2</option>
-                          <option value="4">4</option>
-                          <option value="8">8</option>
+                          <option value={IndentSize.two}>
+                            {IndentSize.two}
+                          </option>
+                          <option value={IndentSize.four}>
+                            {IndentSize.four}
+                          </option>
+                          <option value={IndentSize.eight}>
+                            {IndentSize.eight}
+                          </option>
                         </optgroup>
                       </select>
                     </div>
@@ -193,7 +206,14 @@ export default function GistForm({
                         id={formFieldKeys.lineWrapMode}
                         className="rounded-md px-2 py-1 text-sm bg-primary-gray text-primary-white border border-r-8 border-transparent"
                         value={values.lineWrapMode}
-                        onChange={handleChange}
+                        onChange={e => {
+                          handleChange(e);
+                          document.dispatchEvent(
+                            new CustomEvent('line-wrapping-change', {
+                              detail: e.target.value,
+                            })
+                          );
+                        }}
                         onBlur={handleBlur}
                       >
                         <optgroup label="Line Wrap Mode">
@@ -219,6 +239,8 @@ export default function GistForm({
                 readOnly ? null : 'h-0 flex-grow'
               }`}
               readonly={readOnly}
+              tabSize={values.indentSize}
+              lineWrapping={values.lineWrapMode}
             />
             <div className="p-2 bg-secondary-gray border border-gray-600 rounded-b-md text-sm">
               {readOnly ? null : (
