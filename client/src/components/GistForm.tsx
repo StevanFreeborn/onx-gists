@@ -239,7 +239,7 @@ export default function GistForm({
                     onBlur={handleBlur}
                   >
                     <optgroup label="Visibility">
-                      <option value={''}>
+                      <option value={Visibility.private}>
                         {toTitleCase(Visibility.private)}
                       </option>
                       <option value={Visibility.public}>
