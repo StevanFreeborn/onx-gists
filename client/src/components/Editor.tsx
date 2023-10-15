@@ -1,8 +1,13 @@
 'use client';
 
+import { LineWrapMode } from '@/types';
 import { indentWithTab } from '@codemirror/commands';
 import { javascript } from '@codemirror/lang-javascript';
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import {
+  HighlightStyle,
+  indentUnit,
+  syntaxHighlighting,
+} from '@codemirror/language';
 import { Compartment, EditorState, Text } from '@codemirror/state';
 import {
   Decoration,
@@ -94,11 +99,15 @@ export default function Editor({
   setDocState,
   readonly = false,
   className,
+  tabSize,
+  lineWrapping,
 }: {
   docState?: string[];
   setDocState?: (state: string[]) => void;
   readonly?: boolean;
   className?: string;
+  tabSize?: number;
+  lineWrapping?: string;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -155,8 +164,9 @@ export default function Editor({
 
     // TODO: Add tab size setting
     // TODO: Add line wrapping setting
-    const tabSize = new Compartment();
-    const lineWrapping = new Compartment();
+    const tabSizeCompartment = new Compartment();
+
+    const lineWrappingCompartment = new Compartment();
 
     const extensions = [
       basicSetup,
@@ -165,7 +175,10 @@ export default function Editor({
       fieldViewPlugin,
       listViewPlugin,
       syntaxHighlighting(highlightStyle),
-      tabSize.of(EditorState.tabSize.of(2)),
+      tabSizeCompartment.of(indentUnit.of(' '.repeat(tabSize ?? 2))),
+      lineWrappingCompartment.of(
+        lineWrapping === LineWrapMode.softWrap ? EditorView.lineWrapping : []
+      ),
       EditorState.readOnly.of(readonly),
       theme,
     ];
@@ -190,8 +203,46 @@ export default function Editor({
       parent: editorRef.current,
     });
 
+    // TODO: If we pulled all of this into a hook
+    // I could probably remove the need for custom
+    // events and just return callable functions
+    // to change the settings
+    function handleTabSizeChange(e: CustomEvent<number>) {
+      view.dispatch({
+        effects: tabSizeCompartment.reconfigure(
+          indentUnit.of(' '.repeat(e.detail))
+        ),
+      });
+    }
+
+    document.addEventListener(
+      'tab-size-change',
+      handleTabSizeChange as EventListener
+    );
+
+    function handleLineWrappingChange(e: CustomEvent<string>) {
+      const ext =
+        e.detail === LineWrapMode.softWrap ? EditorView.lineWrapping : [];
+      view.dispatch({
+        effects: lineWrappingCompartment.reconfigure(ext),
+      });
+    }
+
+    document.addEventListener(
+      'line-wrapping-change',
+      handleLineWrappingChange as EventListener
+    );
+
     return () => {
       view.destroy();
+      document.removeEventListener(
+        'tab-size-change',
+        handleTabSizeChange as EventListener
+      );
+      document.removeEventListener(
+        'line-wrapping-change',
+        handleLineWrappingChange as EventListener
+      );
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
