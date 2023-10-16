@@ -37,6 +37,8 @@ builder.Services.AddCors(
 
 builder.Services.Configure<DbOptions>(config.GetSection(nameof(DbOptions)));
 builder.Services.AddSingleton<DbContext>();
+await builder.Services.AddIndexes();
+
 builder.Services.AddScoped<IGistRepository, GistRepository>();
 builder.Services.AddScoped<IValidator<NewGistDto>, NewGistDtoValidator>();
 builder.Services.AddScoped<IValidator<GistDto>, GistDtoValidator>();
