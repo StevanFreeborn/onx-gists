@@ -114,14 +114,11 @@ export default function Navbar() {
   function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const searchTerm = formData.get('searchTerm');
-
-    if (!searchTerm) {
+    if (!term) {
       return;
     }
 
-    const encodedSearchTerm = encodeURIComponent(searchTerm.toString());
+    const encodedSearchTerm = encodeURIComponent(term.toString());
     router.push(`/search?searchTerm=${encodedSearchTerm}`);
     router.refresh();
   }
