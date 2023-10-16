@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import NProgress from 'nprogress';
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { AiFillCaretDown, AiOutlinePlus } from 'react-icons/ai';
 
 function SignOutButton() {
@@ -79,6 +79,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const searchTerm = searchParams.get('searchTerm');
+  const [term, setTerm] = useState('');
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -96,20 +98,32 @@ export default function Navbar() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [pathname, searchParams, status, userModalRef, isUserModalOpen]);
 
+  useEffect(() => {
+    if (searchTerm) {
+      setTerm(searchTerm);
+      return;
+    }
+
+    setTerm('');
+  }, [pathname, searchParams, searchTerm]);
+
+  function handleSearchInputChange(e: ChangeEvent<HTMLInputElement>) {
+    setTerm(e.target.value);
+  }
+
   function handleSearch(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
     const searchTerm = formData.get('searchTerm');
 
-    if (searchTerm === null) {
+    if (!searchTerm) {
       return;
     }
 
     const encodedSearchTerm = encodeURIComponent(searchTerm.toString());
     router.push(`/search?searchTerm=${encodedSearchTerm}`);
     router.refresh();
-    e.currentTarget.reset();
   }
 
   return (
@@ -146,6 +160,8 @@ export default function Navbar() {
               </svg>
             </button>
             <input
+              onChange={handleSearchInputChange}
+              value={term}
               type="text"
               id="search-navbar"
               name="searchTerm"
@@ -211,7 +227,10 @@ export default function Navbar() {
               </svg>
             </button>
             <input
+              onChange={handleSearchInputChange}
+              value={term}
               type="text"
+              name="searchTerm"
               id="search-navbar"
               className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white"
               placeholder="Search..."
