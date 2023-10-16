@@ -101,6 +101,7 @@ export default function Editor({
   className,
   tabSize,
   lineWrapping,
+  hideEditorScrollbar = false,
 }: {
   docState?: string[];
   setDocState?: (state: string[]) => void;
@@ -108,6 +109,7 @@ export default function Editor({
   className?: string;
   tabSize?: number;
   lineWrapping?: string;
+  hideEditorScrollbar?: boolean;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -127,7 +129,7 @@ export default function Editor({
           caretColor: '#f8f8f0',
         },
         '.cm-content, .cm-gutter': { height: '100%' },
-        '.cm-scroller': { overflow: 'auto' },
+        '.cm-scroller': { overflow: hideEditorScrollbar ? 'hidden' : 'auto' },
         '.cm-cursor, .cm-dropCursor': {
           borderLeftColor: '#f8f8f0',
         },

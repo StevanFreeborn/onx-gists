@@ -7,10 +7,12 @@ export default function SortDetails({
   sortBy,
   direction,
   page,
+  searchTerm,
 }: {
   sortBy?: string | null;
   direction?: string | null;
   page?: number;
+  searchTerm?: string;
 }) {
   const currentLinkKey =
     sortBy === undefined ||
@@ -47,6 +49,17 @@ export default function SortDetails({
     links = Object.fromEntries(
       Object.entries(links).map(([key, value]) => {
         return [key, { ...value, href: `${value.href}&page=${page}` }];
+      })
+    );
+  }
+
+  if (searchTerm) {
+    links = Object.fromEntries(
+      Object.entries(links).map(([key, value]) => {
+        return [
+          key,
+          { ...value, href: `${value.href}&searchTerm=${searchTerm}` },
+        ];
       })
     );
   }

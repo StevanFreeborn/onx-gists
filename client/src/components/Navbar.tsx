@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import NProgress from 'nprogress';
-import { useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { AiFillCaretDown, AiOutlinePlus } from 'react-icons/ai';
 
 function SignOutButton() {
@@ -78,6 +78,7 @@ export default function Navbar() {
   const userImageSrc = session?.user?.image ?? 'https://placehold.co/400';
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -95,6 +96,22 @@ export default function Navbar() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [pathname, searchParams, status, userModalRef, isUserModalOpen]);
 
+  function handleSearch(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const searchTerm = formData.get('searchTerm');
+
+    if (searchTerm === null) {
+      return;
+    }
+
+    const encodedSearchTerm = encodeURIComponent(searchTerm.toString());
+    router.push(`/search?searchTerm=${encodedSearchTerm}`);
+    router.refresh();
+    e.currentTarget.reset();
+  }
+
   return (
     <nav className="bg-secondary-gray text-primary-white shadow-[rgba(0,_0,_0,_0.05)_0px_2px_5px_0px]">
       <div className="flex flex-col items-center justify-between mx-auto p-4 md:flex-row">
@@ -107,8 +124,12 @@ export default function Navbar() {
               Gists
             </span>
           </Link>
-          <div className="relative hidden md:block">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <form onSubmit={handleSearch} className="relative hidden md:block">
+            <button
+              title="Search"
+              type="submit"
+              className="absolute inset-y-0 left-0 flex items-center pl-3"
+            >
               <svg
                 className="w-4 h-4 text-gray-500 dark:text-gray-400"
                 xmlns="http://www.w3.org/2000/svg"
@@ -123,14 +144,15 @@ export default function Navbar() {
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
-            </div>
+            </button>
             <input
               type="text"
               id="search-navbar"
+              name="searchTerm"
               className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white"
               placeholder="Search..."
             />
-          </div>
+          </form>
           <div className="flex md:order-1">
             {status === 'authenticated' ? (
               <Link
@@ -167,8 +189,12 @@ export default function Navbar() {
           style={{ display: isNavbarOpen ? 'block' : '' }}
           id="navbar-search"
         >
-          <div className="relative mt-3 md:hidden">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <form onSubmit={handleSearch} className="relative mt-3 md:hidden">
+            <button
+              title="Search"
+              type="submit"
+              className="absolute inset-y-0 left-0 flex items-center pl-3"
+            >
               <svg
                 className="w-4 h-4 text-gray-400"
                 xmlns="http://www.w3.org/2000/svg"
@@ -183,14 +209,14 @@ export default function Navbar() {
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
-            </div>
+            </button>
             <input
               type="text"
               id="search-navbar"
               className="block w-full p-2 pl-10 text-sm border rounded-lg bg-primary-gray border-gray-600 placeholder-gray-400 text-white"
               placeholder="Search..."
             />
-          </div>
+          </form>
           <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border  rounded-lg md:flex-row md:gap-3 md:mt-0 md:border-0 border-gray-600">
             {status === 'loading' ? (
               <li>Loading...</li>
