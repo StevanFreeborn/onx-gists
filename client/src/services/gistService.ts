@@ -70,6 +70,7 @@ export function gistService(client: Client) {
     pageSize?: number;
     includePrivate?: boolean;
     includePublic?: boolean;
+    searchTerm?: string;
   };
 
   async function getGists(
@@ -79,6 +80,7 @@ export function gistService(client: Client) {
       pageSize: 10,
       includePrivate: false,
       includePublic: true,
+      searchTerm: '',
     }
   ): Promise<Result<PagedGists>> {
     const reqUrl = new URL(`${baseUrl}/gists`);

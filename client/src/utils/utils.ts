@@ -77,7 +77,7 @@ export function sortGists(
   });
 }
 
-type SearchParams = {
+export type SearchParams = {
   [key: string]: string | string[] | undefined;
 };
 

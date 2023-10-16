@@ -26,6 +26,7 @@ export default function GistsPage({
   gists,
   pageInfo,
   type,
+  searchTerm,
 }: {
   heading: string;
   isCurrentUsersPage?: boolean;
@@ -35,10 +36,11 @@ export default function GistsPage({
   gists: GistType[];
   pageInfo: PageInfo;
   type?: string;
+  searchTerm?: string;
 }) {
   function renderGists() {
     return gists.map(gist => {
-      return <Gist key={gist.id} gist={gist} />;
+      return <Gist key={gist.id} gist={gist} hideEditorScrollbar={true} />;
     });
   }
 
@@ -69,6 +71,7 @@ export default function GistsPage({
             sortBy={sort}
             direction={direction}
             page={pageInfo.pageNumber}
+            searchTerm={searchTerm}
           />
         </div>
       </div>

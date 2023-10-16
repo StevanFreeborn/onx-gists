@@ -20,6 +20,7 @@ record GistsFilter
   public int PageSize { get; init; } = 10;
   public bool IncludePrivate { get; init; } = false;
   public bool IncludePublic { get; init; } = true;
+  public string SearchTerm { get; init; } = string.Empty;
 
   public static async ValueTask<GistsFilter> BindAsync(HttpContext context, ParameterInfo parameter)
   {
@@ -33,13 +34,15 @@ record GistsFilter
       ? parsedPS
       : 10;
 
-    var includePrivate = query.TryGetValue("includePrivate", out var ip) &&
-      bool.TryParse(ip.ToString(), out var parsedIP) &&
-      parsedIP;
+    var includePrivate = query.TryGetValue("includePrivate", out var ip)
+      ? bool.TryParse(ip.ToString(), out var parsedIP) && parsedIP
+      : false;
 
-    var includePublic = query.TryGetValue("includePublic", out var iPU) &&
-      bool.TryParse(iPU.ToString(), out var parsedIPU) &&
-      parsedIPU;
+    var includePublic = query.TryGetValue("includePublic", out var iPU)
+      ? bool.TryParse(iPU.ToString(), out var parsedIPU) && parsedIPU
+      : true;
+
+    var searchTerm = query.TryGetValue("searchTerm", out var term) ? term.ToString() : string.Empty;
 
     var filter = new GistsFilter
     {
@@ -47,7 +50,8 @@ record GistsFilter
       PageNumber = pageNumber,
       PageSize = pageSize,
       IncludePrivate = includePrivate,
-      IncludePublic = includePublic
+      IncludePublic = includePublic,
+      SearchTerm = searchTerm
     };
 
     return await ValueTask.FromResult(filter);
@@ -67,9 +71,14 @@ record GistsFilter
       filter &= Builders<Gist>.Filter.Ne(gist => gist.Visibility, "private");
     }
 
-    if (UserId != string.Empty)
+    if (string.IsNullOrWhiteSpace(UserId) is false)
     {
       filter &= Builders<Gist>.Filter.Eq(gist => gist.UserId, UserId);
+    }
+
+    if (string.IsNullOrWhiteSpace(SearchTerm) is false)
+    {
+      filter &= Builders<Gist>.Filter.Text(SearchTerm);
     }
 
     return filter;
