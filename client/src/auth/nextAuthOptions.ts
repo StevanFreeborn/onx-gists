@@ -10,6 +10,7 @@ import GoogleProvider from 'next-auth/providers/google';
 declare module 'next-auth' {
   interface Session extends DefaultSession {
     userId?: string;
+    username?: string;
     apiJwt?: string;
     refreshErrored: boolean;
   }

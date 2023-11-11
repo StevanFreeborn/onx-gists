@@ -2,6 +2,7 @@
 
 import { useUserSession } from '@/auth/useUserSession';
 import { useRouter } from '@/hooks/useRouter';
+import { UserProfile } from '@/types';
 import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
@@ -36,13 +37,43 @@ function UserModal({
   session: Session;
   linkClickHandler: () => void;
 }) {
-  const userIdentifier = session.user?.name ?? session.userId ?? 'Unknown';
+  const router = useRouter();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/users/profile/${session.userId}`)
+      .then(res => {
+        if (res.status !== 200) {
+          throw new Error(
+            `Failed to fetch profile: ${res.status} - ${res.statusText}`
+          );
+        }
+
+        return res.json();
+      })
+      .then(data => {
+        setUserProfile(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setUserProfile(null);
+        setIsLoading(false);
+      });
+  }, [session]);
+
+  if (isLoading) {
+    return;
+  }
 
   return (
     <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm z-50">
       <div className="p-3 border-b border-gray-600">
         <div>Signed in as</div>
-        <div className="font-semibold">{userIdentifier}</div>
+        <div className="font-semibold">
+          {userProfile?.username ?? session.userId}
+        </div>
       </div>
       <ul className="flex flex-col gap-2 p-3 border-b border-gray-600">
         <li>

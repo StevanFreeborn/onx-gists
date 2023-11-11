@@ -69,7 +69,9 @@ export default function ProfileForm({ profile }: { profile: UserProfile }) {
       }) => (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
           <div className="flex flex-col gap-2">
-            <label htmlFor={formFieldKeys.username}></label>
+            <label htmlFor={formFieldKeys.username}>
+              {toTitleCase(formFieldKeys.username)}
+            </label>
             <input
               type="text"
               name={formFieldKeys.username}
