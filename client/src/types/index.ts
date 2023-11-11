@@ -90,7 +90,7 @@ export function createGist(gist: GistDto, user: User) {
   return {
     ...gist,
     username: user.username ?? user.id,
-    userImage: user.image ?? 'https://placehold.co/400',
+    userImage: user.image ?? 'https://placehold.co/400?font=roboto&text=User',
   };
 }
 

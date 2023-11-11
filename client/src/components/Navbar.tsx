@@ -37,11 +37,12 @@ function UserModal({
   session: Session;
   linkClickHandler: () => void;
 }) {
-  const router = useRouter();
+  // TODO: This could be better
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // TODO: Extract to user service method
     fetch(`/api/users/profile/${session.userId}`)
       .then(res => {
         if (res.status !== 200) {
@@ -63,8 +64,9 @@ function UserModal({
       });
   }, [session]);
 
+  // TODO: Could provide actual loading state
   if (isLoading) {
-    return;
+    return null;
   }
 
   return (

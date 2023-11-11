@@ -26,6 +26,7 @@ export default function ProfileForm({ profile }: { profile: UserProfile }) {
       validationSchema={validationSchema}
       onSubmit={async (values, { setSubmitting }) => {
         try {
+          // TODO: Extract this to user service method
           const res = await fetch(`/api/users/profile`, {
             method: 'PUT',
             headers: {
