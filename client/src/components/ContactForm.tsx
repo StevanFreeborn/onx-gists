@@ -80,7 +80,9 @@ export default function ContactForm() {
       }) => (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
           <div className="flex flex-col gap-2">
-            <label htmlFor={formFieldKeys.name}>Name</label>
+            <label htmlFor={formFieldKeys.name}>
+              {toTitleCase(formFieldKeys.name)}
+            </label>
             <input
               type="text"
               name={formFieldKeys.name}
@@ -98,7 +100,9 @@ export default function ContactForm() {
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor={formFieldKeys.email}>Email</label>
+            <label htmlFor={formFieldKeys.email}>
+              {toTitleCase(formFieldKeys.email)}
+            </label>
             <input
               type="text"
               name={formFieldKeys.email}
@@ -116,7 +120,9 @@ export default function ContactForm() {
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor={formFieldKeys.subject}>Subject</label>
+            <label htmlFor={formFieldKeys.subject}>
+              {toTitleCase(formFieldKeys.subject)}
+            </label>
             <input
               type="text"
               name={formFieldKeys.subject}
@@ -134,7 +140,9 @@ export default function ContactForm() {
             </span>
           </div>
           <div className="flex flex-col gap-2 flex-1">
-            <label htmlFor={formFieldKeys.message}>Message</label>
+            <label htmlFor={formFieldKeys.message}>
+              {toTitleCase(formFieldKeys.message)}
+            </label>
             <textarea
               name={formFieldKeys.message}
               id={formFieldKeys.message}
