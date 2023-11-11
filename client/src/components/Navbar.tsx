@@ -2,6 +2,7 @@
 
 import { useUserSession } from '@/auth/useUserSession';
 import { useRouter } from '@/hooks/useRouter';
+import { UserProfile } from '@/types';
 import { Session } from 'next-auth';
 import { signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
@@ -30,26 +31,69 @@ function SignOutButton() {
 }
 
 function UserModal({
-  user,
+  session,
   linkClickHandler,
 }: {
-  user: Session | null;
+  session: Session;
   linkClickHandler: () => void;
 }) {
+  // TODO: This could be better
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // TODO: Extract to user service method
+    fetch(`/api/users/profile/${session.userId}`)
+      .then(res => {
+        if (res.status !== 200) {
+          throw new Error(
+            `Failed to fetch profile: ${res.status} - ${res.statusText}`
+          );
+        }
+
+        return res.json();
+      })
+      .then(data => {
+        setUserProfile(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setUserProfile(null);
+        setIsLoading(false);
+      });
+  }, [session]);
+
+  // TODO: Could provide actual loading state
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm z-50">
       <div className="p-3 border-b border-gray-600">
-        <div>Sign in as</div>
-        <div className="font-semibold">{user?.user?.name}</div>
+        <div>Signed in as</div>
+        <div className="font-semibold">
+          {userProfile?.username ?? session.userId}
+        </div>
       </div>
       <ul className="flex flex-col gap-2 p-3 border-b border-gray-600">
         <li>
           <Link
             onClick={linkClickHandler}
-            href={`/${user?.userId}`}
+            href={`/${session.userId}`}
             className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Your gists
+          </Link>
+        </li>
+        <li>
+          <Link
+            onClick={linkClickHandler}
+            href={`/${session.userId}/profile`}
+            className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
+          >
+            Your profile
           </Link>
         </li>
         {/* TODO: Implement starring gists */}
@@ -236,21 +280,11 @@ export default function Navbar() {
           <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border  rounded-lg md:flex-row md:gap-3 md:mt-0 md:border-0 border-gray-600">
             {status === 'loading' ? (
               <li>Loading...</li>
-            ) : status === 'unauthenticated' ? (
-              <li>
-                <Link
-                  onClick={async () => await signIn()}
-                  href="#"
-                  className="block py-2 pl-3 pr-4 text-primary-white rounded md:hover:bg-transparent md:hover:text-primary-orange md:p-0 hover:bg-primary-gray"
-                >
-                  Sign up/in
-                </Link>
-              </li>
-            ) : (
+            ) : status === 'authenticated' ? (
               <>
                 <li className="md:hidden text-sm">
                   <Link
-                    href="#"
+                    href="/"
                     className="flex w-full h-full items-center justify-start py-2 pl-3 pr-4 rounded md:p-0 hover:bg-primary-gray"
                   >
                     All Gists
@@ -268,7 +302,7 @@ export default function Navbar() {
                       height={25}
                       className="rounded-full object-cover"
                     />
-                    {session?.user?.name}
+                    {session.user?.name}
                   </Link>
                 </li>
                 <li className="md:hidden text-sm">
@@ -304,12 +338,22 @@ export default function Navbar() {
                     className={isUserModalOpen ? '' : 'hidden'}
                   >
                     <UserModal
-                      user={session}
+                      session={session}
                       linkClickHandler={() => setIsUserModalOpen(false)}
                     />
                   </div>
                 </li>
               </>
+            ) : (
+              <li>
+                <Link
+                  onClick={async () => await signIn()}
+                  href="#"
+                  className="block py-2 pl-3 pr-4 text-primary-white rounded md:hover:bg-transparent md:hover:text-primary-orange md:p-0 hover:bg-primary-gray"
+                >
+                  Sign up/in
+                </Link>
+              </li>
             )}
           </ul>
         </div>

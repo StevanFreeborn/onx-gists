@@ -11,7 +11,7 @@ export default function Login() {
   const router = useRouter();
   const callbackUrl = queryParams.get('callbackUrl') ?? '/';
   const error = queryParams.get('error');
-  const { status } = useUserSession();
+  const { status, data } = useUserSession();
 
   if (status === 'authenticated') {
     redirect('/');

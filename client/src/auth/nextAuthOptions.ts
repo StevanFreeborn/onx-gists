@@ -2,6 +2,7 @@ import { prismaClient } from '@/data/client';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AuthOptions, DefaultSession, DefaultUser } from 'next-auth';
+import { AdapterUser } from 'next-auth/adapters';
 import { DefaultJWT, JWT } from 'next-auth/jwt';
 import AzureADProvider from 'next-auth/providers/azure-ad';
 import GithubProvider from 'next-auth/providers/github';
@@ -10,6 +11,7 @@ import GoogleProvider from 'next-auth/providers/google';
 declare module 'next-auth' {
   interface Session extends DefaultSession {
     userId?: string;
+    username?: string;
     apiJwt?: string;
     refreshErrored: boolean;
   }
@@ -34,7 +36,36 @@ declare module 'next-auth/jwt' {
 const prisma = prismaClient;
 
 export const nextAuthOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: {
+    ...PrismaAdapter(prisma),
+    createUser: async data => {
+      const emailUsername = data.email.split('@')[0];
+
+      let isUsernameValid = false;
+      let username: string;
+
+      do {
+        const random4DigitNumber = Math.floor(1000 + Math.random() * 9000);
+        username = `${emailUsername}${random4DigitNumber}`.toLowerCase();
+        const existingUser = await prisma.user.findUnique({
+          where: {
+            username,
+          },
+        });
+
+        isUsernameValid = existingUser === null;
+      } while (isUsernameValid === false);
+
+      const user = await prisma.user.create({
+        data: {
+          ...data,
+          username,
+        },
+      });
+
+      return user as AdapterUser;
+    },
+  },
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',

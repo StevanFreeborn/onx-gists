@@ -89,7 +89,15 @@ export type Result<T, E = Error> =
 export function createGist(gist: GistDto, user: User) {
   return {
     ...gist,
-    username: user.id,
-    userImage: user.image ?? 'https://placehold.co/400',
+    username: user.username ?? user.id,
+    userImage: user.image ?? 'https://placehold.co/400?font=roboto&text=User',
   };
 }
+
+export type UserProfile = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+  username: string | null;
+  userImage: string | null;
+};
