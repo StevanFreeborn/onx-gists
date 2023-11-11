@@ -37,6 +37,7 @@ model User {
   image         String?
   enabled       Boolean   @default(true)
   accounts      Account[]
+  username      String?   @unique
 
   @@map("users")
 }
