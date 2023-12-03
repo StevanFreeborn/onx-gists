@@ -140,17 +140,20 @@ export default function GistForm({
             </div>
           )}
           <div>
-            <input
-              type="text"
-              name="description"
-              id="description"
-              placeholder="Gist description"
-              className="w-full rounded-md p-2 text-sm bg-secondary-gray text-primary-white border border-gray-600 read-only:bg-primary-gray read-only:border-none read-only:p-0 read-only:text-sm read-only:pointer-events-none"
-              value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              readOnly={readOnly}
-            />
+            {readOnly ? (
+              <span>{values.description}</span>
+            ) : (
+              <input
+                type="text"
+                name="description"
+                id="description"
+                placeholder="Gist description"
+                className="w-full rounded-md p-2 text-sm bg-secondary-gray text-primary-white border border-gray-600 read-only:bg-primary-gray read-only:border-none read-only:p-0 read-only:text-sm read-only:pointer-events-none"
+                value={values.description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            )}
           </div>
           <div className="flex flex-col flex-1">
             <div className="flex items-start justify-between px-4 py-2 bg-secondary-gray border border-gray-600 rounded-t-md">
