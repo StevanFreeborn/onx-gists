@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { AiFillCaretDown } from 'react-icons/ai';
 import { GiCheckMark } from 'react-icons/gi';
@@ -17,14 +16,14 @@ function DetailLink({
   linkClickHandler: () => void;
 }) {
   return (
-    <Link
+    <a
       onClick={linkClickHandler}
       href={link.href}
       className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
     >
       <GiCheckMark className={currentLinkKey == linkKey ? '' : 'invisible'} />
       <span className="hover:text-primary-orange">{link.linkText}</span>
-    </Link>
+    </a>
   );
 }
 
