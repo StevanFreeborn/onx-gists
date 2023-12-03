@@ -2,6 +2,7 @@ import { nextAuthOptions } from '@/auth/nextAuthOptions';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { Inter } from 'next/font/google';
@@ -43,6 +44,7 @@ export default async function RootLayout({
             theme="dark"
             toastClassName="bg-secondary-gray text-primary-white"
           />
+          <Analytics />
         </body>
       </html>
     </AuthProvider>
