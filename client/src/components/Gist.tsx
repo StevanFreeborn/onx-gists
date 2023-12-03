@@ -2,6 +2,7 @@ import { Gist } from '@/types';
 import { timeFromNow } from '@/utils/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaCircle } from 'react-icons/fa';
 import Editor from './Editor';
 
 export default function Gist({
@@ -40,13 +41,19 @@ export default function Gist({
                 {gist.name}
               </Link>
             </div>
-            <div>
+            <div className="flex gap-2 items-center">
               <div className="text-xs text-gray-500">
                 Created {timeFromNow(gist.created)}
+              </div>
+              <div className=" text-[6px] text-gray-500">
+                <FaCircle />
               </div>
               <div className="text-xs text-gray-500">
                 Updated {timeFromNow(gist.updated)}
               </div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500">{gist.description}</div>
             </div>
           </div>
         </div>
