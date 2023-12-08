@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from '@/hooks/useRouter';
 import { useEffect, useRef } from 'react';
 import { AiFillCaretDown } from 'react-icons/ai';
 import { GiCheckMark } from 'react-icons/gi';
@@ -15,15 +16,20 @@ function DetailLink({
   link: { linkText: string; href: string };
   linkClickHandler: () => void;
 }) {
+  const router = useRouter();
+
   return (
-    <a
-      onClick={linkClickHandler}
-      href={link.href}
+    <button
+      onClick={() => {
+        linkClickHandler();
+        router.push(link.href);
+        router.refresh();
+      }}
       className="flex gap-2 items-center p-2 pl-7 border-b border-gray-600"
     >
       <GiCheckMark className={currentLinkKey == linkKey ? '' : 'invisible'} />
       <span className="hover:text-primary-orange">{link.linkText}</span>
-    </a>
+    </button>
   );
 }
 
