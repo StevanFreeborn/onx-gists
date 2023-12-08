@@ -7,9 +7,11 @@ import { Gist, IndentSize, LineWrapMode, Visibility } from '@/types';
 import { getKeysFromObject, toTitleCase } from '@/utils/utils';
 import { Formik } from 'formik';
 import Link from 'next/link';
+import { useRef } from 'react';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import { BsCode } from 'react-icons/bs';
 import { CgSpinner } from 'react-icons/cg';
+import { IoCopy } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { array, object, string } from 'yup';
 import Editor from './Editor';
@@ -21,6 +23,7 @@ export default function GistForm({
   gist?: Gist;
   readOnly?: boolean;
 }) {
+  const copyButtonRef = useRef<HTMLButtonElement>(null);
   const { user, client } = useAuthClient();
   const { addGist, updateGist } = gistService(client);
   const router = useRouter();
@@ -231,6 +234,26 @@ export default function GistForm({
                     </div>
                   </>
                 )}
+                <button
+                  ref={copyButtonRef}
+                  className="transition-all duration-100"
+                  type="button"
+                  onClick={() => {
+                    const curr = copyButtonRef.current;
+
+                    if (curr === null) {
+                      return;
+                    }
+
+                    curr.style.color = '#d5782f';
+                    setTimeout(() => {
+                      curr.style.color = '';
+                    }, 500);
+                    navigator.clipboard.writeText(values.formula.join('\n'));
+                  }}
+                >
+                  <IoCopy />
+                </button>
               </div>
             </div>
             <Editor
