@@ -16,7 +16,7 @@ export default function Gist({
     <div className="flex flex-col w-full gap-4 max-w-4xl">
       <div>
         <div className="flex gap-3 items-start">
-          <div>
+          <div className="flex-shrink-0">
             <Image
               src={gist.userImage}
               alt="User Image"
