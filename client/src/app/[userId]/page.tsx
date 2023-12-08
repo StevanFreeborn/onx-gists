@@ -58,7 +58,11 @@ export default async function UsersGists({
 
   return (
     <GistsPage
-      heading={isCurrentUsersPage ? 'Your gists' : `${user.id}'s gists`}
+      heading={
+        isCurrentUsersPage
+          ? 'Your gists'
+          : `${user.username ?? user.id}'s gists`
+      }
       isCurrentUsersPage={isCurrentUsersPage}
       currentUserId={params.userId}
       sort={sort}

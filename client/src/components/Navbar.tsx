@@ -40,6 +40,7 @@ function UserModal({
   // TODO: This could be better
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // TODO: Extract to user service method
@@ -79,22 +80,28 @@ function UserModal({
       </div>
       <ul className="flex flex-col gap-2 p-3 border-b border-gray-600">
         <li>
-          <Link
-            onClick={linkClickHandler}
-            href={`/${session.userId}`}
+          <button
+            onClick={() => {
+              linkClickHandler();
+              router.push(`/${session.userId}`);
+              router.refresh();
+            }}
             className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Your gists
-          </Link>
+          </button>
         </li>
         <li>
-          <Link
-            onClick={linkClickHandler}
-            href={`/${session.userId}/profile`}
+          <button
+            onClick={() => {
+              linkClickHandler();
+              router.push(`/${session.userId}/profile`);
+              router.refresh();
+            }}
             className="block rounded md:p-0 md:hover:text-primary-orange hover:bg-gray-700 md:hover:bg-transparent"
           >
             Your profile
-          </Link>
+          </button>
         </li>
         {/* TODO: Implement starring gists */}
         {/* <li>
