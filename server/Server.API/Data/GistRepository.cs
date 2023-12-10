@@ -69,6 +69,7 @@ class GistRepository : IGistRepository
       );
 
       var aggregate = await _context.Gists.Aggregate()
+        .Sort(filter.ToSortDefinition())
         .Match(filter.ToFilterDefinition())
         .Facet(countFacet, dataFacet)
         .FirstOrDefaultAsync();

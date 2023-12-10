@@ -27,7 +27,12 @@ export default async function Home({
   const sort = getSortQueryParam(searchParams);
   const direction = getDirectionQueryParam(searchParams);
 
-  const gistsResult = await getGists({ pageNumber: page, includePublic: true });
+  const gistsResult = await getGists({
+    pageNumber: page,
+    includePublic: true,
+    sort: sort,
+    direction: direction,
+  });
 
   if (gistsResult.ok === false) {
     throw new Error('Error getting gists');

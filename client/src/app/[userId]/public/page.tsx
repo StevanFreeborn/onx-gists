@@ -43,6 +43,8 @@ export default async function UsersPublicGists({
     userId: params.userId,
     pageNumber: page,
     includePublic: true,
+    sort: sort,
+    direction: direction,
   });
 
   if (gistsResult.ok === false) {

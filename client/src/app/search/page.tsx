@@ -33,6 +33,8 @@ export default async function Search({
     includePublic: true,
     includePrivate: false,
     searchTerm: searchTerm,
+    sort: sort,
+    direction: direction,
   });
 
   if (gistsResult.ok === false) {

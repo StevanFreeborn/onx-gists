@@ -21,6 +21,8 @@ record GistsFilter
   public bool IncludePrivate { get; init; } = false;
   public bool IncludePublic { get; init; } = true;
   public string SearchTerm { get; init; } = string.Empty;
+  public string SortBy { get; init; } = string.Empty;
+  public string SortDirection { get; init; } = string.Empty;
 
   public static async ValueTask<GistsFilter> BindAsync(HttpContext context, ParameterInfo parameter)
   {
@@ -44,6 +46,14 @@ record GistsFilter
 
     var searchTerm = query.TryGetValue("searchTerm", out var term) ? term.ToString() : string.Empty;
 
+    var sortBy = query.TryGetValue("sort", out var sort)
+      ? sort.ToString()
+      : "created";
+
+    var sortDirection = query.TryGetValue("direction", out var sortDir)
+      ? sortDir.ToString()
+      : "desc";
+
     var filter = new GistsFilter
     {
       UserId = userId,
@@ -51,7 +61,9 @@ record GistsFilter
       PageSize = pageSize,
       IncludePrivate = includePrivate,
       IncludePublic = includePublic,
-      SearchTerm = searchTerm
+      SearchTerm = searchTerm,
+      SortBy = sortBy,
+      SortDirection = sortDirection
     };
 
     return await ValueTask.FromResult(filter);
@@ -82,6 +94,37 @@ record GistsFilter
     }
 
     return filter;
+  }
+
+  internal SortDefinition<Gist> ToSortDefinition()
+  {
+    var sort = Builders<Gist>.Sort
+      .Descending(gist => gist.Created)
+      .Descending(gist => gist.Id);
+
+    if (SortBy.Equals("created", StringComparison.OrdinalIgnoreCase))
+    {
+      sort = SortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
+        ? Builders<Gist>.Sort
+          .Ascending(gist => gist.Created)
+          .Ascending(gist => gist.Id)
+        : Builders<Gist>.Sort
+          .Descending(gist => gist.Created)
+          .Descending(gist => gist.Id);
+    }
+
+    if (SortBy.Equals("updated", StringComparison.OrdinalIgnoreCase))
+    {
+      sort = SortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
+        ? Builders<Gist>.Sort
+          .Ascending(gist => gist.Updated)
+          .Ascending(gist => gist.Id)
+        : Builders<Gist>.Sort
+          .Descending(gist => gist.Updated)
+          .Descending(gist => gist.Id);
+    }
+
+    return sort;
   }
 }
 

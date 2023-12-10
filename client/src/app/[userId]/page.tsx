@@ -44,6 +44,8 @@ export default async function UsersGists({
     pageNumber: page,
     includePrivate: isCurrentUsersPage,
     includePublic: true,
+    sort: sort,
+    direction: direction,
   });
 
   if (gistsResult.ok === false) {
