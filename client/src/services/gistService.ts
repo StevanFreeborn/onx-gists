@@ -64,13 +64,15 @@ export function gistService(client: Client) {
   }
 
   type GetGistsRequest = {
-    [key: string]: string | number | boolean | undefined;
+    [key: string]: string | number | boolean | undefined | null;
     userId?: string;
     pageNumber?: number;
     pageSize?: number;
     includePrivate?: boolean;
     includePublic?: boolean;
     searchTerm?: string;
+    sort?: string | null;
+    order?: string | null;
   };
 
   async function getGists(
@@ -81,6 +83,8 @@ export function gistService(client: Client) {
       includePrivate: false,
       includePublic: true,
       searchTerm: '',
+      sort: 'created',
+      order: 'desc',
     }
   ): Promise<Result<PagedGists>> {
     const reqUrl = new URL(`${baseUrl}/gists`);

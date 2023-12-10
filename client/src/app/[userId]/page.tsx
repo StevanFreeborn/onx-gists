@@ -8,7 +8,6 @@ import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
-  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 import NotFound from '../not-found';
@@ -44,6 +43,8 @@ export default async function UsersGists({
     pageNumber: page,
     includePrivate: isCurrentUsersPage,
     includePublic: true,
+    sort: sort,
+    direction: direction,
   });
 
   if (gistsResult.ok === false) {
@@ -53,8 +54,6 @@ export default async function UsersGists({
   const { gists: gistDtos, ...pageInfo } = gistsResult.value;
 
   const gists = gistDtos.map(gist => createGist(gist, user));
-
-  const sortedGists = sortGists(gists, sort, direction);
 
   return (
     <GistsPage
@@ -67,7 +66,7 @@ export default async function UsersGists({
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
-      gists={sortedGists}
+      gists={gists}
       pageInfo={pageInfo}
     />
   );
