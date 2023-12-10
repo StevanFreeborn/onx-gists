@@ -9,7 +9,6 @@ import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
-  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
@@ -55,8 +54,6 @@ export default async function UsersPublicGists({
 
   const gists = gistDtos.map(gist => createGist(gist, user));
 
-  const sortedGists = sortGists(gists, sort, direction);
-
   return (
     <GistsPage
       heading={
@@ -66,7 +63,7 @@ export default async function UsersPublicGists({
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
-      gists={sortedGists}
+      gists={gists}
       pageInfo={pageInfo}
       type={Visibility.public}
     />

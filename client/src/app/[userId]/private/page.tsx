@@ -9,7 +9,6 @@ import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
-  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
@@ -56,8 +55,6 @@ export default async function UsersPrivateGists({
 
   const gists = gistDtos.map(gist => createGist(gist, user));
 
-  const sortedGists = sortGists(gists, sort, direction);
-
   return (
     <GistsPage
       heading="Your private gists"
@@ -65,7 +62,7 @@ export default async function UsersPrivateGists({
       currentUserId={params.userId}
       sort={sort}
       direction={direction}
-      gists={sortedGists}
+      gists={gists}
       pageInfo={pageInfo}
       type={Visibility.private}
     />

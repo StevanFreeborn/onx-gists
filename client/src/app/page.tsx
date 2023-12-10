@@ -8,7 +8,6 @@ import {
   getDirectionQueryParam,
   getPageQueryParam,
   getSortQueryParam,
-  sortGists,
 } from '@/utils/utils';
 import { getServerSession } from 'next-auth';
 
@@ -56,14 +55,12 @@ export default async function Home({
     gists.push(createGist(gistDto, user));
   }
 
-  const sortedGists = sortGists(gists, sort, direction);
-
   return (
     <GistsPage
       heading="Discover gists"
       sort={sort}
       direction={direction}
-      gists={sortedGists}
+      gists={gists}
       pageInfo={pageInfo}
     />
   );
