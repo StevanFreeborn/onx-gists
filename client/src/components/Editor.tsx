@@ -154,7 +154,10 @@ export default function Editor({
         '.cm-activeLineGutter': {
           backgroundColor: 'transparent',
         },
-        '.field-token, .field-token .ͼu': {
+        '.field-token + .ͼp': {
+          color: '#d0d9e4',
+        },
+        '.field-token, .field-token .ͼu, .field-token .ͼp': {
           color: '#f08008',
         },
         '.list-value-token': {
