@@ -28,17 +28,17 @@ My hope is that OnxGists can be a place for admins to find and share useful Onsp
 
 Next.js is used for the frontend of the site. It's a React framework that makes it easy to create apps that support both server-side rendering and client-side rendering. It also has a lot of other great features like automatic code splitting, file-system routing, and more.
 
-It also supports serverless functions which in this case are used in conjuction with NextAuth.js to create the API routes for authentication.
+It also supports serverless functions which in this case are used in conjunction with NextAuth.js to create the API routes for authentication.
 
 ### [NextAuth.js](https://next-auth.js.org/)
 
 NextAuth.js is used for the authentication of the site. It's a complete open source authentication solution for Next.js apps. It supports authentication with email/password, social providers, and more. In this case I used it to support authentication with GitHub, Azure AD, and Google.
 
-I also have used the NextAuth hooks and middleware to essentially act as an identity server for the gist service. Essentially the gist service is a protected API that can only be accessed by authenticated users. In the NextAuth middleware I handle the issuing and refreshing of the access tokens for the API. This allows me to use the same authentication for both the frontend and the API.
+I also have used the NextAuth.js hooks and middleware to essentially act as an identity server for the gist service. Essentially the gist service is a protected API that can only be accessed by authenticated users that have a valid access token. In the NextAuth.js middleware I handle the issuing and refreshing of the access tokens for the API. This allows me to use the same authentication for both the frontend and the API.
 
 ### [Prisma](https://www.prisma.io/)
 
-Prisma is used in the Next app to connect to the database. It's an open source database toolkit that makes it easy to access and manipulate data in a database. It also has a lot of other great features like migrations, schema management, and more. In this case I used it to connect to the MongoDB database and do a lot of the heavy lifting of the CRUD operations for user management.
+Prisma is used in the Next.js app to connect to the database. It's an ORM that makes it easy to access and manipulate data in a database. It also has a lot of other great features like migrations, schema management, and more. In this case I used it to connect to the MongoDB database and do a lot of the heavy lifting of the CRUD operations for user management. NextAuth.js also supports using Prisma as the database for user management so it was a natural fit.
 
 ### [Tailwind CSS](https://tailwindcss.com/)
 
