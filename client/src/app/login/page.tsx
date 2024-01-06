@@ -4,7 +4,7 @@ import { useUserSession } from '@/auth/useUserSession';
 import { useRouter } from '@/hooks/useRouter';
 import { signIn } from 'next-auth/react';
 import { redirect, useSearchParams } from 'next/navigation';
-import { BsGithub, BsGoogle } from 'react-icons/bs';
+import { BsGithub, BsGoogle, BsMicrosoft } from 'react-icons/bs';
 
 export default function Login() {
   const queryParams = useSearchParams();
@@ -54,15 +54,14 @@ export default function Login() {
           <BsGoogle className="w-5 h-5" />
           Sign in with Google
         </button>
-        {/* TODO: Investigate further logins with non-tenant users */}
-        {/* <button
+        <button
           type="button"
           onClick={async () => handleSignIn('azure-ad')}
           className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-primary-gray hover:bg-gradient-to-r from-red-600 via-green-600 to-blue-600"
         >
           <BsMicrosoft className="w-5 h-5" />
           Sign in with Microsoft
-        </button> */}
+        </button>
       </div>
     </main>
   );
