@@ -42,7 +42,7 @@ record GistsFilter
 
     var includePublic = query.TryGetValue("includePublic", out var iPU)
       ? bool.TryParse(iPU.ToString(), out var parsedIPU) && parsedIPU
-      : true;
+      : false;
 
     var searchTerm = query.TryGetValue("searchTerm", out var term) ? term.ToString() : string.Empty;
 
