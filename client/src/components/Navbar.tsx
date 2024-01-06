@@ -74,7 +74,7 @@ function UserModal({
     <div className="absolute flex flex-col mt-2 right-0 left-auto w-[180px] bg-secondary-gray border border-gray-600 rounded-md text-primary-white text-sm z-50">
       <div className="p-3 border-b border-gray-600">
         <div>Signed in as</div>
-        <div className="font-semibold">
+        <div className="font-semibold overflow-hidden text-ellipsis">
           {userProfile?.username ?? session.userId}
         </div>
       </div>
