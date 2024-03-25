@@ -8,13 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send request
-        run: |
-          response=$(curl -sSf -w "HTTP %{http_code}" https://onxgists.stevanfreeborn.com/)
-          echo $response
+        run: curl -LI https://onxgists.stevanfreeborn.com/ -o /dev/null -w '%{http_code}\n' -s
   ping-server:
     runs-on: ubuntu-latest
     steps:
       - name: Send Ping Request
-        run: |
-          response=$(curl -sSf -w "HTTP %{http_code}" https://onxgists.azurewebsites.net/ping)
-          echo $response
+        run: curl -LI https://onxgists.azurewebsites.net/ping -o /dev/null -w '%{http_code}\n' -s
