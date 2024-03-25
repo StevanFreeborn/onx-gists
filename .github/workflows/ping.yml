@@ -4,7 +4,14 @@ on:
   schedule:
     - cron: '*/15 * * * *'
 jobs:
-  ping:
+  ping-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send request
+        run: |
+          response=$(curl -sSf -w "HTTP %{http_code}" https://onxgists.stevanfreeborn.com/)
+          echo $response
+  ping-server:
     runs-on: ubuntu-latest
     steps:
       - name: Send Ping Request
